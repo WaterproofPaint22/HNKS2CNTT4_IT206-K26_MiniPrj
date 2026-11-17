@@ -1,0 +1,3756 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smartphone Matcher & Segment Analyzer — Trợ Lý Tư Vấn Cho Tech Reviewer</title>
+
+  <!-- Google Fonts: Be Vietnam Pro -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Be Vietnam Pro"', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          },
+          boxShadow: {
+            'card': '0 2px 12px -2px rgba(15, 23, 42, 0.06), 0 1px 4px -1px rgba(15, 23, 42, 0.04)',
+            'card-hover': '0 12px 28px -6px rgba(79, 70, 229, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.06)',
+            'floating': '0 -8px 30px -5px rgba(15, 23, 42, 0.16)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+      font-family: 'Be Vietnam Pro', sans-serif;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-fade-up {
+      animation: fadeSlideUp 0.28s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-indigo-600 selection:text-white min-h-screen flex flex-col">
+
+  <!-- =====================================================================
+       HEADER CỐ ĐỊNH (STICKY NAVIGATION BAR)
+       ===================================================================== -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      <!-- Logo & Tên Ứng Dụng -->
+      <button onclick="resetToHome()" class="flex items-center gap-3 text-left group focus:outline-none">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-slate-900 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform shrink-0">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="3" />
+            <path d="M9 7h6M9 11h4M12 18h.01" stroke-linecap="round" />
+            <path d="M2 8h3M2 16h3M19 8h3M19 16h3" stroke-linecap="round" class="text-emerald-300" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
+              Smartphone Matcher
+            </span>
+            <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/80">
+              Segment Analyzer
+            </span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-slate-500 font-medium">
+            Trợ lý phân tích & chốt tư vấn điện thoại chính hãng VN
+          </p>
+        </div>
+      </button>
+
+      <!-- Cụm Nút Điều Hướng Bên Phải -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Nút Trang Chủ -->
+        <button id="navHomeBtn" onclick="resetToHome()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span class="hidden sm:inline">Trang chủ</span>
+        </button>
+
+        <!-- Nút Kiểm Duyệt Database 3 Tiêu Chí -->
+        <button onclick="openDbManagerModal()" title="Quản lý & kiểm duyệt dữ liệu điện thoại theo 3 tiêu chí" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 transition-all">
+          <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <span class="hidden md:inline">Kiểm duyệt DB</span>
+          <span id="headerDbCountBadge" class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md text-[11px] font-bold bg-emerald-600 text-white">
+            0
+          </span>
+        </button>
+
+        <!-- Nút Mở Danh Sách Máy Yêu Thích -->
+        <button onclick="toggleFavoritesDrawer(true)" class="relative inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-slate-100/80 hover:bg-rose-50 hover:text-rose-600 border border-slate-200/80 transition-all">
+          <svg class="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+          </svg>
+          <span class="hidden sm:inline">Đã lưu</span>
+          <span id="headerFavBadge" class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-xs font-bold bg-rose-500 text-white">
+            0
+          </span>
+        </button>
+
+        <!-- Nút Mở So Sánh 2 Máy -->
+        <button id="headerCompareBtn" onclick="handleHeaderCompareClick()" class="relative inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span>So sánh</span>
+          <span id="headerCompareBadge" class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md text-[11px] font-bold bg-white/20 text-white">
+            0/2
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       KHU VỰC THANH TÌM KIẾM ĐIỆN THOẠI & BỘ LỌC TIÊU CHÍ (SMARTPHONE-ONLY)
+       ===================================================================== -->
+  <section class="bg-white border-b border-slate-200/90 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 space-y-4">
+
+      <!-- Hàng 1: Ô tìm kiếm chuyên biệt Smartphone + Dropdown Phân khúc giá + Dropdown Thương hiệu -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+        <!-- Ô Tìm Kiếm Chỉ Dành Cho Điện Thoại -->
+        <div class="md:col-span-6 relative">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-indigo-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="7" y="2" width="10" height="20" rx="2.5" />
+              <path d="M11 18h2" stroke-linecap="round" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            id="searchInput"
+            aria-label="Tìm kiếm điện thoại thông minh"
+            placeholder="Tìm điện thoại: tên máy, hãng, chip, camera, pin mAh hoặc phân khúc..."
+            class="w-full pl-11 pr-28 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+          />
+          <div class="absolute inset-y-0 right-2.5 flex items-center gap-1.5">
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide bg-indigo-50 text-indigo-700 border border-indigo-200/80 pointer-events-none">
+              Điện thoại
+            </span>
+            <button
+              id="clearSearchBtn"
+              onclick="clearSearchInput()"
+              title="Xóa từ khóa tìm kiếm điện thoại"
+              class="hidden p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-colors"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bộ Lọc Phân Khúc Giá -->
+        <div class="md:col-span-3 relative">
+          <select
+            id="priceSelect"
+            aria-label="Lọc theo phân khúc giá điện thoại"
+            class="w-full px-3.5 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all cursor-pointer"
+          >
+            <option value="all">💰 Tất cả phân khúc giá</option>
+            <option value="under-5">Dưới 5 triệu (Phổ thông)</option>
+            <option value="5-10">5 - 10 triệu (Tầm trung)</option>
+            <option value="10-15">10 - 15 triệu (Cận cao cấp)</option>
+            <option value="15-22">15 - 22 triệu (Cao cấp)</option>
+            <option value="over-22">Trên 22 triệu (Flagship & Gập)</option>
+          </select>
+        </div>
+
+        <!-- Bộ Lọc Thương Hiệu Điện Thoại Chính Hãng -->
+        <div class="md:col-span-3 relative">
+          <select
+            id="brandSelect"
+            aria-label="Lọc theo thương hiệu điện thoại chính hãng"
+            class="w-full px-3.5 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all cursor-pointer"
+          >
+            <option value="all">🏢 Tất cả hãng điện thoại</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Hàng 2: Thanh Lọc Nhanh Theo Tiêu Chí Tư Vấn Điện Thoại -->
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1" id="criteriaFilterGroup">
+        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider shrink-0 mr-1">
+          Tiêu chí tư vấn:
+        </span>
+        <button data-criterion="all" class="criterion-pill active shrink-0 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold border transition-all bg-indigo-600 text-white border-indigo-600 shadow-xs">
+          Tất cả tiêu chí
+        </button>
+        <button data-criterion="performance" class="criterion-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold border transition-all bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/60">
+          ⚡ Hiệu năng cao
+        </button>
+        <button data-criterion="camera" class="criterion-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold border transition-all bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/60">
+          📸 Camera tốt
+        </button>
+        <button data-criterion="battery" class="criterion-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold border transition-all bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/60">
+          🔋 Pin trâu
+        </button>
+        <button data-criterion="design" class="criterion-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold border transition-all bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/60">
+          ✨ Thiết kế cao cấp
+        </button>
+        <button data-criterion="foldable" class="criterion-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold border transition-all bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/60">
+          📱 Màn hình gập
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       NỘI DUNG CHÍNH (MAIN CONTAINER)
+       ===================================================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-28">
+
+    <!-- ===================================================================
+         TRẠNG THÁI 1: TRANG CHÍNH MẶC ĐỊNH (HOME VIEW)
+         =================================================================== -->
+    <div id="homeView" class="space-y-8 sm:space-y-10 animate-fade-up">
+
+      <!-- 1. HERO BANNER GIỚI THIỆU CÔNG CỤ CHO TECH REVIEWER -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-10 shadow-lg border border-indigo-500/20">
+        <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-semibold">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              Dữ liệu kiểm duyệt Thế Giới Di Động • Mốc 16/11/2026
+            </div>
+
+            <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+              Tư vấn đúng điện thoại trong <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-sky-300 to-emerald-300">cùng một phân khúc giá</span>
+            </h1>
+
+            <p class="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
+              Cùng tầm giá có hàng chục mẫu smartphone khác nhau: có những chiếc thiên về <strong class="text-white">cấu hình chiến game</strong>, có những chiếc mạnh về<strong class="text-white">chụp chân dung xóa phông</strong>, có những chiếc lại nổi bật với<strong class="text-white">pin Silicon-Carbon 7000mAh</strong> hay <strong class="text-white">màn hình gập</strong>. Hệ thống tự động loại bỏ máy ngừng kinh doanh & đời cũ quá 2 năm để Tech Reviewer tư vấn chuẩn xác.
+            </p>
+
+            <!-- Kịch bản tư vấn nhanh -->
+            <div class="pt-2">
+              <p class="text-xs font-semibold uppercase tracking-wider text-indigo-300 mb-2.5">
+                ⚡ Kịch bản tư vấn nhanh thường gặp:
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <button onclick="applyQuickScenario('15-22', 'camera')" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs sm:text-sm font-medium text-white transition-all flex items-center gap-1.5">
+                  <span>📸</span> Tầm 15 - 22tr chụp chân dung đẹp
+                </button>
+                <button onclick="applyQuickScenario('5-10', 'battery')" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs sm:text-sm font-medium text-white transition-all flex items-center gap-1.5">
+                  <span>🔋</span> Tầm 5 - 10tr pin trâu dùng 2 ngày
+                </button>
+                <button onclick="applyQuickScenario('over-22', 'foldable')" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs sm:text-sm font-medium text-white transition-all flex items-center gap-1.5">
+                  <span>📱</span> Điện thoại màn hình gập 2026
+                </button>
+                <button onclick="applyQuickScenario('under-5', 'all')" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs sm:text-sm font-medium text-white transition-all flex items-center gap-1.5">
+                  <span>🛡️</span> Smartphone giá rẻ dưới 5tr
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bảng Thống Kê Kiểm Duyệt Dữ Liệu Chuẩn 3 Tiêu Chí -->
+          <div class="lg:col-span-5 bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-2">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Kiểm duyệt Database 3 tiêu chí
+              </h2>
+              <button onclick="openDbManagerModal()" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 transition-colors">
+                Quản lý DB →
+              </button>
+            </div>
+
+            <!-- 3 Ô Chỉ Số Thống Kê -->
+            <div class="grid grid-cols-3 gap-2.5 text-center">
+              <div class="rounded-xl bg-slate-900/60 border border-white/10 p-2.5">
+                <div id="statApprovedCount" class="text-xl sm:text-2xl font-extrabold text-emerald-400">0</div>
+                <div class="text-[11px] text-slate-300 font-medium mt-0.5">Máy đạt chuẩn</div>
+              </div>
+              <div class="rounded-xl bg-slate-900/60 border border-white/10 p-2.5">
+                <div id="statActiveBrandsCount" class="text-xl sm:text-2xl font-extrabold text-indigo-300">0</div>
+                <div class="text-[11px] text-slate-300 font-medium mt-0.5">Hãng đang bán</div>
+              </div>
+              <div class="rounded-xl bg-slate-900/60 border border-white/10 p-2.5">
+                <div id="statPurgedCount" class="text-xl sm:text-2xl font-extrabold text-rose-400">0</div>
+                <div class="text-[11px] text-slate-300 font-medium mt-0.5">Đã tự động loại</div>
+              </div>
+            </div>
+
+            <!-- Tóm tắt 3 quy tắc lọc tự động -->
+            <ul class="space-y-2 text-xs text-slate-200 border-t border-white/10 pt-3">
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-400 font-bold shrink-0">✓</span>
+                <span><strong class="text-white">Ra mắt trong 1 năm:</strong> Chỉ giữ máy sản xuất từ <code class="text-indigo-200">16/11/2025</code> đến <code class="text-indigo-200">16/11/2026</code>.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-400 font-bold shrink-0">✓</span>
+                <span><strong class="text-white">Trạng thái kinh doanh:</strong> Tự động xóa toàn bộ máy <span class="text-rose-300 font-semibold">"Ngừng kinh doanh"</span>.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-400 font-bold shrink-0">✓</span>
+                <span><strong class="text-white">Top 10 mới nhất / hãng:</strong> Lấy tối đa 10 mẫu mới nhất mỗi hãng (hoặc toàn bộ nếu &lt;10 mẫu). Hãng hết máy tự động ẩn.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. KHU VỰC THƯƠNG HIỆU ĐIỆN THOẠI CHÍNH HÃNG TẠI THẾ GIỚI DI ĐỘNG -->
+      <section class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                Thương hiệu điện thoại chính hãng tại Thế Giới Di Động
+              </h2>
+              <span id="homeActiveBrandsBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                10 Hãng Đang Bán
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+              Bấm vào logo từng hãng để xem danh sách các mẫu máy mới nhất trong vòng 1 năm qua (tối đa 10 mẫu/hãng) kèm phân tích tư vấn.
+            </p>
+          </div>
+          <button onclick="showAllProducts()" class="self-start sm:self-auto inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2.5 rounded-xl shadow-xs transition-colors">
+            <span>Xem tất cả điện thoại đạt chuẩn</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Lưới Thương Hiệu Với Logo SVG Sắc Nét -->
+        <div id="brandsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4"></div>
+      </section>
+
+    </div>
+
+    <!-- ===================================================================
+         TRẠNG THÁI 2: KẾT QUẢ LỌC / TÌM KIẾM ĐIỆN THOẠI (RESULTS VIEW)
+         =================================================================== -->
+    <div id="resultsView" class="hidden space-y-6 animate-fade-up">
+
+      <!-- Thanh Điều Hướng Quay Lại Trang Chủ & Trạng Thái Lọc -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button onclick="resetToHome()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200/80 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Quay lại Trang chủ (Banner & Thương hiệu)</span>
+          </button>
+
+          <div class="h-5 w-px bg-slate-200 hidden sm:block"></div>
+
+          <!-- Khu vực hiển thị các badge bộ lọc đang áp dụng -->
+          <div id="activeFilterChips" class="flex flex-wrap items-center gap-2"></div>
+        </div>
+
+        <!-- Bộ Đếm Kết Quả & Sắp Xếp -->
+        <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+          <span class="text-xs sm:text-sm text-slate-600 font-medium">
+            Tìm thấy <strong id="resultCount" class="text-indigo-600 font-extrabold">0</strong> điện thoại
+          </span>
+
+          <select id="sortSelect" aria-label="Sắp xếp kết quả điện thoại" class="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-700 focus:outline-none focus:border-indigo-500 cursor-pointer">
+            <option value="newest">Sắp xếp: Mới ra mắt nhất</option>
+            <option value="price-asc">Giá: Thấp → Cao</option>
+            <option value="price-desc">Giá: Cao → Thấp</option>
+            <option value="perf-desc">Điểm Hiệu năng cao nhất</option>
+            <option value="cam-desc">Điểm Camera cao nhất</option>
+            <option value="bat-desc">Điểm Pin & Sạc cao nhất</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Lưới Hiển Thị Các Thẻ Smartphone -->
+      <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+
+      <!-- Trạng Thái Không Tìm Thấy Điện Thoại -->
+      <div id="emptyState" class="hidden bg-white rounded-3xl p-10 text-center border border-slate-200 space-y-4">
+        <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 id="emptyStateTitle" class="text-lg font-bold text-slate-900">Không có mẫu điện thoại nào khớp với bộ lọc hiện tại</h3>
+        <p id="emptyStateDesc" class="text-sm text-slate-500 max-w-md mx-auto">
+          Thử nới rộng phân khúc giá, đổi tiêu chí nhu cầu hoặc xóa bớt từ khóa tìm kiếm để xem thêm gợi ý điện thoại.
+        </p>
+        <button onclick="resetToHome()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+          Đặt lại bộ lọc & Về Trang chủ
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- =====================================================================
+       THANH SO SÁNH NỔI Ở ĐÁY MÀN HÌNH (FLOATING COMPARE BAR)
+       ===================================================================== -->
+  <div id="floatingCompareBar" class="hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-floating transition-transform duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div id="compareBarSlots" class="w-full md:w-auto flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+      <div id="compareBarActions" class="w-full md:w-auto flex items-center justify-end gap-2 shrink-0"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       NGĂN KÉO DANH SÁCH MÁY YÊU THÍCH (FAVORITES SLIDE-OVER DRAWER)
+       ===================================================================== -->
+  <div id="favoritesDrawerBackdrop" onclick="toggleFavoritesDrawer(false)" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs transition-opacity"></div>
+  <aside id="favoritesDrawer" class="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white shadow-2xl border-l border-slate-200 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-slate-900 text-base">Danh sách máy đã lưu</h3>
+          <p class="text-xs text-slate-500">Tự động lưu trên trình duyệt (không mất khi F5)</p>
+        </div>
+      </div>
+      <button onclick="toggleFavoritesDrawer(false)" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div id="favoritesListContainer" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
+
+    <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-3">
+      <button onclick="clearAllFavorites()" class="text-xs font-semibold text-slate-500 hover:text-rose-600 transition-colors">
+        Xóa tất cả danh sách
+      </button>
+      <button onclick="toggleFavoritesDrawer(false)" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs sm:text-sm font-semibold hover:bg-slate-800 transition-colors">
+        Đóng lại
+      </button>
+    </div>
+  </aside>
+
+  <!-- =====================================================================
+       MODAL SO SÁNH ĐỐI ĐẦU 2 MÁY CÙNG TẦM GIÁ (COMPARE ANALYZER MODAL)
+       ===================================================================== -->
+  <div id="compareModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/65 backdrop-blur-xs p-3 sm:p-6 flex items-start justify-center">
+    <div class="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 my-4 sm:my-8 overflow-hidden animate-fade-up">
+      <div class="px-5 sm:px-7 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex items-center justify-between gap-4">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-300">
+            Segment Head-to-Head Analyzer
+          </span>
+          <h3 class="text-lg sm:text-xl font-extrabold">
+            Bảng đối chiếu & Kịch bản chốt tư vấn
+          </h3>
+        </div>
+        <button onclick="closeCompareModal()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div id="compareModalBody" class="p-4 sm:p-7 space-y-6 max-h-[82vh] overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL QUẢN LÝ & KIỂM DUYỆT DATABASE 3 TIÊU CHÍ (DB CURATION MANAGER)
+       ===================================================================== -->
+  <div id="dbManagerModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/65 backdrop-blur-xs p-3 sm:p-6 flex items-start justify-center">
+    <div class="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200 my-4 sm:my-6 overflow-hidden animate-fade-up">
+      <div class="px-5 sm:px-7 py-4 bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white flex items-center justify-between gap-4">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-300">
+            Database Curation Engine • Mốc 16/11/2026
+          </span>
+          <h3 class="text-lg sm:text-xl font-extrabold">
+            Kiểm duyệt & Quản lý danh sách điện thoại (3 tiêu chí bắt buộc)
+          </h3>
+        </div>
+        <button onclick="closeDbManagerModal()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-6 max-h-[82vh] overflow-y-auto">
+        <!-- Báo cáo kiểm duyệt tự động -->
+        <div id="dbAuditReportBox" class="rounded-2xl bg-slate-50 border border-slate-200 p-4 space-y-2 text-xs sm:text-sm"></div>
+
+        <!-- Form thêm nhanh mẫu điện thoại mới -->
+        <form id="addPhoneForm" onsubmit="handleAddPhoneSubmit(event)" class="rounded-2xl bg-indigo-50/60 border border-indigo-200/80 p-4 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h4 class="font-bold text-sm text-indigo-950">
+              ➕ Thêm mẫu điện thoại mới vào dữ liệu nguồn (Tự động kiểm duyệt 3 tiêu chí)
+            </h4>
+            <button type="button" onclick="resetDatabaseToDefault()" class="text-xs font-semibold text-slate-600 hover:text-rose-600 underline">
+              Khôi phục dữ liệu gốc
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5">
+            <input type="text" id="newPhoneName" required placeholder="Tên máy (VD: OPPO Find X11)" class="lg:col-span-2 px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-indigo-500" />
+            <select id="newPhoneBrand" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-indigo-500"></select>
+            <input type="number" id="newPhonePrice" required min="1000000" step="10000" placeholder="Giá VNĐ (VD: 19990000)" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-indigo-500" />
+            <input type="date" id="newPhoneDate" required value="2026-11-10" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-indigo-500" />
+            <select id="newPhoneStatus" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500">
+              <option value="Đang kinh doanh">Đang kinh doanh</option>
+              <option value="Ngừng kinh doanh">Ngừng kinh doanh</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <input type="text" id="newPhoneChip" placeholder="Vi xử lý (VD: Snapdragon 8 Elite Gen 5)" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-indigo-500" />
+            <input type="text" id="newPhoneCamera" placeholder="Camera (VD: 50MP OIS + Tele 3x)" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-indigo-500" />
+            <input type="text" id="newPhoneBattery" placeholder="Pin/Sạc (VD: 6500mAh • Sạc 80W)" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-indigo-500" />
+          </div>
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <input type="url" id="newPhoneUrl" placeholder="Link TGDĐ đích danh (tự động tạo /dtdd/... nếu để trống)" class="flex-1 px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-indigo-500" />
+            <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shrink-0 transition-colors">
+              Thêm & Lọc
+            </button>
+          </div>
+        </form>
+
+        <!-- Bảng kiểm duyệt trạng thái từng máy -->
+        <div class="border border-slate-200 rounded-2xl overflow-hidden">
+          <div class="bg-slate-100 px-4 py-2.5 flex items-center justify-between border-b border-slate-200">
+            <span class="font-bold text-xs sm:text-sm text-slate-800">
+              Danh sách dữ liệu nguồn (Bấm đổi trạng thái sang "Ngừng kinh doanh" để kiểm tra xóa tự động)
+            </span>
+          </div>
+          <div id="dbRawTableContainer" class="divide-y divide-slate-200 max-h-80 overflow-y-auto text-xs sm:text-sm"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       TOAST THÔNG BÁO GỌN GÀNG (THAY THẾ HOÀN TOÀN ALERT)
+       ===================================================================== -->
+  <div id="toastContainer" class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- =====================================================================
+       JAVASCRIPT MODULAR ARCHITECTURE (VANILLA JS)
+       ===================================================================== -->
+  <script>
+    (() => {
+      /**
+       * =========================================================================
+       * MODULE 1: CẤU HÌNH QUY TẮC KIỂM DUYỆT & DANH MỤC THƯƠNG HIỆU TGDĐ
+       * =========================================================================
+       */
+      const REFERENCE_DATE = '2026-11-16';
+      const MIN_RELEASE_DATE = '2025-11-16';
+      const MAX_MODELS_PER_BRAND = 10;
+
+      const STORAGE_KEYS = {
+        FAVORITES: 'sm_matcher_favorites_v2',
+        COMPARE: 'sm_matcher_compare_v2',
+        RAW_PHONES: 'sm_matcher_raw_phones_v3',
+        VIEW_STATE: 'sm_matcher_view_state_v2'
+      };
+
+      const CRITERION_LABELS = {
+        performance: '⚡ Hiệu năng cao',
+        camera: '📸 Camera tốt',
+        battery: '🔋 Pin trâu',
+        design: '✨ Thiết kế cao cấp',
+        foldable: '📱 Màn hình gập'
+      };
+
+      const PRICE_LABELS = {
+        'under-5': 'Dưới 5 triệu',
+        '5-10': '5 - 10 triệu',
+        '10-15': '10 - 15 triệu',
+        '15-22': '15 - 22 triệu',
+        'over-22': 'Trên 22 triệu'
+      };
+
+      const BRANDS_MASTER = [
+        {
+          id: 'apple',
+          name: 'Apple (iPhone)',
+          shortName: 'Apple',
+          tagline: 'Hệ sinh thái iOS • Quay video chuẩn mực • Giữ giá cao',
+          accent: '#0f172a',
+          logoSvg: `<svg viewBox="0 0 140 36" class="h-7 w-auto"><path fill="#0f172a" d="M24.2 18.8c0-3.6 2.9-5.4 3.1-5.5-1.7-2.5-4.3-2.8-5.2-2.9-2.2-.2-4.3 1.3-5.4 1.3-1.1 0-2.9-1.3-4.7-1.2-2.4 0-4.6 1.4-5.9 3.6-2.5 4.4-.6 10.9 1.8 14.4 1.2 1.7 2.6 3.7 4.5 3.6 1.8-.1 2.5-1.2 4.7-1.2 2.2 0 2.8 1.2 4.7 1.1 2 0 3.2-1.8 4.4-3.5 1.4-2 2-4 2-4.1-.1-.1-3.9-1.5-4-5.6zM20.6 7.8c1-1.2 1.7-2.9 1.5-4.6-1.4.1-3.2 1-4.2 2.2-.9 1-1.7 2.8-1.5 4.4 1.6.1 3.2-.8 4.2-2z"/><text x="38" y="25" font-family="Be Vietnam Pro, sans-serif" font-weight="800" font-size="18" fill="#0f172a">iPhone</text></svg>`
+        },
+        {
+          id: 'samsung',
+          name: 'Samsung',
+          shortName: 'Samsung',
+          tagline: 'Galaxy AI toàn diện • Màn hình Dynamic AMOLED • Dẫn đầu máy gập',
+          accent: '#1428a0',
+          logoSvg: `<svg viewBox="0 0 156 36" class="h-7 w-auto"><rect x="4" y="5" width="148" height="26" rx="13" fill="#1428a0"/><text x="78" y="23" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-weight="800" font-size="15" letter-spacing="2.2" fill="#ffffff">SAMSUNG</text></svg>`
+        },
+        {
+          id: 'xiaomi',
+          name: 'Xiaomi',
+          shortName: 'Xiaomi',
+          tagline: 'Cấu hình/Giá vô đối • Hợp tác ống kính Leica • Sạc siêu nhanh',
+          accent: '#ff6900',
+          logoSvg: `<svg viewBox="0 0 146 36" class="h-7 w-auto"><rect x="4" y="4" width="28" height="28" rx="7" fill="#ff6900"/><path fill="#fff" d="M10 11h10c2.2 0 4 1.8 4 4v10h-3.2V15.4c0-.8-.6-1.4-1.4-1.4h-6.2V25H10V11zm5.2 5.5h3.2V25h-3.2v-8.5z"/><text x="40" y="24" font-family="Be Vietnam Pro, sans-serif" font-weight="800" font-size="18" fill="#0f172a">Xiaomi</text></svg>`
+        },
+        {
+          id: 'oppo',
+          name: 'OPPO',
+          shortName: 'OPPO',
+          tagline: 'Chuyên gia chân dung AI • Sạc nhanh SUPERVOOC • Thiết kế mỏng nhẹ',
+          accent: '#046a38',
+          logoSvg: `<svg viewBox="0 0 140 36" class="h-7 w-auto"><text x="70" y="25" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-weight="800" font-size="22" letter-spacing="3" fill="#046a38">oppo</text></svg>`
+        },
+        {
+          id: 'vivo',
+          name: 'vivo',
+          shortName: 'vivo',
+          tagline: 'Camera ZEISS chân dung nghệ thuật • Pin BlueVolt siêu mỏng',
+          accent: '#415fff',
+          logoSvg: `<svg viewBox="0 0 130 36" class="h-7 w-auto"><text x="65" y="25" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-weight="800" font-size="23" letter-spacing="2" fill="#415fff">vivo</text></svg>`
+        },
+        {
+          id: 'realme',
+          name: 'realme',
+          shortName: 'realme',
+          tagline: 'Hiệu năng bứt phá cho giới trẻ • Sạc nhanh công suất cao',
+          accent: '#eab308',
+          logoSvg: `<svg viewBox="0 0 146 36" class="h-7 w-auto"><rect x="4" y="6" width="138" height="24" rx="6" fill="#fef08a"/><text x="73" y="23" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-weight="800" font-size="17" letter-spacing="1.2" fill="#0f172a">realme</text></svg>`
+        },
+        {
+          id: 'honor',
+          name: 'HONOR',
+          shortName: 'HONOR',
+          tagline: 'Màn hình bảo vệ mắt PWM cao • Pin Silicon-Carbon bền bỉ',
+          accent: '#0284c7',
+          logoSvg: `<svg viewBox="0 0 146 36" class="h-7 w-auto"><text x="73" y="24" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-weight="800" font-size="19" letter-spacing="2.5" fill="#0f172a">HONOR</text></svg>`
+        },
+        {
+          id: 'tecno',
+          name: 'TECNO',
+          shortName: 'TECNO',
+          tagline: 'Cấu hình mạnh trong tầm giá phổ thông • Màn hình 120Hz mượt mà',
+          accent: '#2563eb',
+          logoSvg: `<svg viewBox="0 0 146 36" class="h-7 w-auto"><text x="73" y="24" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-weight="800" font-size="19" letter-spacing="2" fill="#2563eb">TECNO</text></svg>`
+        },
+        {
+          id: 'nubia',
+          name: 'nubia',
+          shortName: 'nubia',
+          tagline: 'Smartphone Gaming giá tốt • Phím trigger cảm ứng & tản nhiệt',
+          accent: '#dc2626',
+          logoSvg: `<svg viewBox="0 0 140 36" class="h-7 w-auto"><text x="70" y="24" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-weight="800" font-size="21" letter-spacing="1.5" fill="#dc2626">nubia</text></svg>`
+        },
+        {
+          id: 'motorola',
+          name: 'Motorola',
+          shortName: 'Motorola',
+          tagline: 'Android thuần mượt mà • Màn hình gập razr thời trang • Chuẩn bền quân đội',
+          accent: '#0369a1',
+          logoSvg: `<svg viewBox="0 0 156 36" class="h-7 w-auto"><circle cx="20" cy="18" r="12" fill="#0369a1"/><path fill="#fff" d="M14 23l3.6-10.5L20 18l2.4-5.5L26 23h-2.2l-1.6-4.8L20 22.5l-2.2-4.3L16.2 23H14z"/><text x="38" y="23" font-family="Be Vietnam Pro, sans-serif" font-weight="800" font-size="16" fill="#0f172a">motorola</text></svg>`
+        },
+        {
+          id: 'asus',
+          name: 'ASUS ROG',
+          shortName: 'ASUS',
+          tagline: 'Gaming Flagship chuyên biệt (Tự động ẩn nếu không còn máy đang kinh doanh)',
+          accent: '#b91c1c',
+          logoSvg: `<svg viewBox="0 0 140 36" class="h-7 w-auto"><text x="70" y="24" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-weight="800" font-size="20" letter-spacing="2" fill="#b91c1c">ASUS</text></svg>`
+        }
+      ];
+
+      /**
+       * =========================================================================
+       * MODULE 2: DỮ LIỆU ĐIỆN THOẠI NGUỒN (THẾ GIỚI DI ĐỘNG • MỐC 16/11/2026)
+       * =========================================================================
+       */
+      const RAW_PHONES_DEFAULT = [
+        // --- APPLE (8 máy đạt chuẩn trong 1 năm + 1 máy ngừng kinh doanh) ---
+        {
+          id: 'iphone-duo',
+          name: 'iPhone Duo',
+          brandId: 'apple',
+          price: 64990000,
+          releaseDate: '2026-09-18',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/iphone-duo',
+          criteria: ['foldable', 'design', 'performance'],
+          scores: { performance: 99, camera: 95, battery: 89, design: 99 },
+          specs: {
+            chip: 'Apple A20 Pro (2nm)',
+            ramStorage: '12GB / 256GB',
+            display: 'Trong 7.6" & Ngoài 5.4" Super Retina XDR 120Hz',
+            camera: 'Camera kép 48MP Fusion Pro',
+            battery: '4600mAh • Sạc nhanh MagSafe'
+          },
+          targetAudience: 'Khách hàng cao cấp yêu thích iPhone màn hình gập đầu tiên của Apple.',
+          reviewerNote: 'Thiết kế gập ngang tỷ lệ vàng mở ra không gian làm việc như iPad mini bỏ túi.'
+        },
+        {
+          id: 'iphone-18-pro-max',
+          name: 'iPhone 18 Pro Max',
+          brandId: 'apple',
+          price: 41990000,
+          releaseDate: '2026-09-18',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/iphone-18-pro-max',
+          criteria: ['performance', 'camera', 'battery', 'design'],
+          scores: { performance: 99, camera: 99, battery: 95, design: 97 },
+          specs: {
+            chip: 'Apple A20 Pro (2nm)',
+            ramStorage: '12GB / 256GB',
+            display: '6.9" Super Retina XDR ProMotion 120Hz',
+            camera: '3 Camera 48MP Fusion khẩu độ tùy chỉnh + Zoom quang 8x',
+            battery: 'Xem video 43 giờ • Sạc nhanh 50% trong 15 phút'
+          },
+          targetAudience: 'Nhà sáng tạo nội dung quay video chuyên nghiệp, doanh nhân cần máy ổn định 5 năm.',
+          reviewerNote: 'Buồng hơi tản nhiệt lớn gấp 3 lần và camera chính khẩu độ tùy chỉnh, quay ProRes vô đối.'
+        },
+        {
+          id: 'iphone-18-pro',
+          name: 'iPhone 18 Pro',
+          brandId: 'apple',
+          price: 38990000,
+          releaseDate: '2026-09-18',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/iphone-18-pro',
+          criteria: ['performance', 'camera', 'design'],
+          scores: { performance: 98, camera: 98, battery: 88, design: 97 },
+          specs: {
+            chip: 'Apple A20 Pro (2nm)',
+            ramStorage: '12GB / 256GB',
+            display: '6.3" Super Retina XDR 120Hz',
+            camera: '3 Camera 48MP Fusion + Zoom quang 8x',
+            battery: 'Sạc nhanh 50% trong 15 phút • USB 3'
+          },
+          targetAudience: 'Khách thích flagship nhỏ gọn cầm một tay nhưng cấu hình & camera ngang bản Pro Max.',
+          reviewerNote: 'Tư vấn cho khách ngại máy to nặng túi quần; đầy đủ cụm 3 camera 48MP Pro và chip A20 Pro.'
+        },
+        {
+          id: 'iphone-17e',
+          name: 'iPhone 17e',
+          brandId: 'apple',
+          price: 21990000,
+          releaseDate: '2026-02-20',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/iphone-17e',
+          criteria: ['performance', 'design'],
+          scores: { performance: 90, camera: 84, battery: 84, design: 89 },
+          specs: {
+            chip: 'Apple A19',
+            ramStorage: '8GB / 256GB',
+            display: '6.1" OLED Super Retina XDR 60Hz',
+            camera: '48MP Fusion chính 2-trong-1',
+            battery: 'Xem video 21 giờ • Hỗ trợ MagSafe'
+          },
+          targetAudience: 'Sinh viên, nhân viên văn phòng muốn dùng iPhone đời mới hỗ trợ Apple Intelligence & MagSafe.',
+          reviewerNote: 'Lựa chọn iPhone thế hệ mới dễ tiếp cận nhất năm 2026, đã có sẵn MagSafe và bộ nhớ 256GB.'
+        },
+        {
+          id: 'iphone-air',
+          name: 'iPhone Air',
+          brandId: 'apple',
+          price: 22990000,
+          releaseDate: '2025-11-20',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/iphone-air',
+          criteria: ['design', 'performance'],
+          scores: { performance: 94, camera: 87, battery: 82, design: 99 },
+          specs: {
+            chip: 'Apple A19 Pro',
+            ramStorage: '12GB / 256GB',
+            display: '6.5" Super Retina XDR 120Hz Siêu mỏng 5.6mm',
+            camera: '48MP Fusion Main OIS • Camera trước 18MP',
+            battery: 'Xem video 27 giờ • Sạc MagSafe'
+          },
+          targetAudience: 'Khách yêu thời trang, thích điện thoại siêu mỏng nhẹ 5.6mm khác biệt hoàn toàn.',
+          reviewerNote: 'Tên gọi chính thức là iPhone Air (không có số 18); dùng chip A19 Pro mạnh mẽ trong thân máy siêu mỏng.'
+        },
+        {
+          id: 'iphone-17-pro-max',
+          name: 'iPhone 17 Pro Max',
+          brandId: 'apple',
+          price: 34990000,
+          releaseDate: '2025-11-20',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/iphone-17-pro-max',
+          criteria: ['performance', 'camera', 'battery', 'design'],
+          scores: { performance: 96, camera: 96, battery: 93, design: 95 },
+          specs: {
+            chip: 'Apple A19 Pro (3nm)',
+            ramStorage: '12GB / 256GB',
+            display: '6.9" Super Retina XDR ProMotion 120Hz',
+            camera: '3 Camera 48MP Pro Fusion + Zoom quang 8x',
+            battery: 'Xem video 33 giờ • Sạc 50% trong 20 phút'
+          },
+          targetAudience: 'Khách săn Pro Max màn hình lớn tiết kiệm tới 7 triệu so với iPhone 18 Pro Max.',
+          reviewerNote: 'Hiệu năng A19 Pro và camera vẫn cực kỳ dư dả trong 4 năm tới, lựa chọn kinh tế ở phân khúc Pro Max.'
+        },
+        {
+          id: 'iphone-17-pro',
+          name: 'iPhone 17 Pro',
+          brandId: 'apple',
+          price: 31990000,
+          releaseDate: '2025-11-20',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/iphone-17-pro',
+          criteria: ['performance', 'camera', 'design'],
+          scores: { performance: 95, camera: 95, battery: 86, design: 95 },
+          specs: {
+            chip: 'Apple A19 Pro (3nm)',
+            ramStorage: '12GB / 256GB',
+            display: '6.3" Super Retina XDR ProMotion 120Hz',
+            camera: '3 Camera 48MP Pro Fusion + Zoom quang 8x',
+            battery: 'Xem video 28 giờ • Sạc 50% trong 20 phút'
+          },
+          targetAudience: 'Người dùng thích dòng Pro nhỏ gọn tiết kiệm 7 triệu so với 18 Pro.',
+          reviewerNote: 'Mức giá sau điều chỉnh rất hợp lý cho khách cần quay video ProRes 4K120fps.'
+        },
+        {
+          id: 'iphone-17',
+          name: 'iPhone 17',
+          brandId: 'apple',
+          price: 28990000,
+          releaseDate: '2025-11-20',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/iphone-17',
+          criteria: ['performance', 'camera', 'design'],
+          scores: { performance: 93, camera: 90, battery: 87, design: 93 },
+          specs: {
+            chip: 'Apple A19',
+            ramStorage: '8GB / 256GB',
+            display: '6.3" Super Retina XDR ProMotion 120Hz',
+            camera: '48MP Fusion Chính + 48MP UltraWide',
+            battery: 'Xem video 27 giờ • USB-C'
+          },
+          targetAudience: 'Người dùng phổ thông nâng cấp từ iPhone 13/14 muốn màn hình 120Hz và bộ nhớ 256GB.',
+          reviewerNote: 'Bản tiêu chuẩn đã nâng lên màn hình 6.3 inch 120Hz ProMotion nên dùng rất sướng.'
+        },
+        {
+          id: 'iphone-15-plus-old',
+          name: 'iPhone 15 Plus',
+          brandId: 'apple',
+          price: 18990000,
+          releaseDate: '2023-09-22',
+          status: 'Ngừng kinh doanh',
+          criteria: ['battery'],
+          scores: { performance: 82, camera: 82, battery: 90, design: 85 },
+          specs: {
+            chip: 'Apple A16 Bionic',
+            ramStorage: '6GB / 128GB',
+            display: '6.7" OLED 60Hz',
+            camera: '48MP Chính',
+            battery: '4383mAh'
+          },
+          targetAudience: 'Đã ngừng kinh doanh tại TGDĐ.',
+          reviewerNote: 'Tự động loại bỏ khỏi database.'
+        },
+
+        // --- SAMSUNG (10 máy đạt chuẩn mới nhất + Galaxy M55 ngừng kinh doanh) ---
+        {
+          id: 'galaxy-s26-fe-5g',
+          name: 'Samsung Galaxy S26 FE 5G',
+          brandId: 'samsung',
+          price: 15490000,
+          releaseDate: '2026-09-25',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/samsung-galaxy-s26-fe-8gb-128gb',
+          criteria: ['performance', 'camera', 'design'],
+          scores: { performance: 90, camera: 89, battery: 88, design: 90 },
+          specs: {
+            chip: 'Exynos 2500',
+            ramStorage: '8GB / 128GB',
+            display: '6.7" Dynamic AMOLED 2X 120Hz',
+            camera: 'Bộ 3 Camera 50MP OIS + Tele 3x',
+            battery: '4900mAh • One UI 9 & Galaxy AI'
+          },
+          targetAudience: 'Khách tầm 15-16 triệu muốn trải nghiệm đầy đủ Galaxy AI và camera Tele của dòng S.',
+          reviewerNote: 'Lựa chọn thay thế hoàn hảo ở phân khúc cận cao cấp với 7 năm cập nhật Android.'
+        },
+        {
+          id: 'galaxy-z-fold8-ultra',
+          name: 'Samsung Galaxy Z Fold8 Ultra',
+          brandId: 'samsung',
+          price: 47490000,
+          releaseDate: '2026-08-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/samsung-galaxy-z-fold8-ultra',
+          criteria: ['foldable', 'performance', 'camera', 'design'],
+          scores: { performance: 98, camera: 96, battery: 91, design: 99 },
+          specs: {
+            chip: 'Snapdragon 8 Elite Gen 5 for Galaxy',
+            ramStorage: '12GB / 256GB',
+            display: 'Chính 8.0" QXGA+ 120Hz • Phụ 6.5" AMOLED',
+            camera: '200MP Ultra OIS + Tele tiềm vọng 5x',
+            battery: '5000mAh • Sạc nhanh 45W'
+          },
+          targetAudience: 'Doanh nhân cao cấp muốn chiếc điện thoại gập sở hữu cụm camera ngang dòng S Ultra.',
+          reviewerNote: 'Phiên bản Ultra đầu tiên của dòng Fold nâng cấp mạnh cảm biến 200MP và màn hình chống chói.'
+        },
+        {
+          id: 'galaxy-z-fold8',
+          name: 'Samsung Galaxy Z Fold8',
+          brandId: 'samsung',
+          price: 41190000,
+          releaseDate: '2026-08-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/samsung-galaxy-z-fold8',
+          criteria: ['foldable', 'performance', 'design'],
+          scores: { performance: 97, camera: 92, battery: 88, design: 98 },
+          specs: {
+            chip: 'Snapdragon 8 Elite Gen 5 for Galaxy',
+            ramStorage: '12GB / 256GB',
+            display: 'Chính 8.0" QXGA+ 120Hz • Phụ 6.5" AMOLED',
+            camera: '50MP OIS + Tele 3x + Góc rộng 12MP',
+            battery: '4800mAh • Sạc nhanh 45W'
+          },
+          targetAudience: 'Doanh nhân, quản lý cần đa nhiệm 3 cửa sổ như máy tính bảng bỏ túi.',
+          reviewerNote: 'Mỏng nhẹ hơn đời trước, tích hợp Galaxy AI dịch trực tiếp cuộc gọi và tóm tắt tài liệu.'
+        },
+        {
+          id: 'galaxy-z-flip8',
+          name: 'Samsung Galaxy Z Flip8',
+          brandId: 'samsung',
+          price: 26990000,
+          releaseDate: '2026-08-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/samsung-galaxy-z-flip8',
+          criteria: ['foldable', 'design', 'camera'],
+          scores: { performance: 93, camera: 89, battery: 85, design: 98 },
+          specs: {
+            chip: 'Snapdragon 8 Elite Gen 5 for Galaxy',
+            ramStorage: '12GB / 256GB',
+            display: 'Chính 6.7" FHD+ 120Hz • Phụ 4.0" FlexWindow',
+            camera: '50MP OIS + 12MP Góc siêu rộng',
+            battery: '4200mAh • Sạc nhanh 25W'
+          },
+          targetAudience: 'Khách hàng trẻ yêu thời trang, thích gập vỏ sò gọn nhẹ & chụp FlexCam rảnh tay.',
+          reviewerNote: 'Màn hình phụ 4 inch dùng mượt mọi app mà không cần mở máy; rất hợp tư vấn cho khách nữ cá tính.'
+        },
+        {
+          id: 'galaxy-a27',
+          name: 'Samsung Galaxy A27',
+          brandId: 'samsung',
+          price: 6190000,
+          releaseDate: '2026-04-05',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/samsung-galaxy-a27-6gb-128gb',
+          criteria: ['battery', 'design'],
+          scores: { performance: 76, camera: 79, battery: 89, design: 83 },
+          specs: {
+            chip: 'Exynos 1380',
+            ramStorage: '6GB / 128GB',
+            display: '6.7" Super AMOLED FHD+ 120Hz',
+            camera: '50MP OIS + 8MP UltraWide',
+            battery: '5000mAh • Sạc nhanh 25W'
+          },
+          targetAudience: 'Người dùng phổ thông thích màn AMOLED lớn 6.7", có chống rung OIS tầm 6 triệu.',
+          reviewerNote: 'Điểm cộng lớn nhất là có chống rung quang học OIS ở phân khúc 6 triệu.'
+        },
+        {
+          id: 'galaxy-a57-5g',
+          name: 'Samsung Galaxy A57 5G',
+          brandId: 'samsung',
+          price: 10700000,
+          releaseDate: '2026-03-15',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/samsung-galaxy-a57-8gb-128gb',
+          criteria: ['design', 'camera', 'battery'],
+          scores: { performance: 85, camera: 87, battery: 88, design: 91 },
+          specs: {
+            chip: 'Exynos 1680 (4nm)',
+            ramStorage: '8GB / 128GB',
+            display: '6.7" Super AMOLED Plus 120Hz Vision Booster',
+            camera: '50MP OIS + 12MP UltraWide + 5MP Macro',
+            battery: '5000mAh • Sạc nhanh 45W • Mỏng 6.9mm'
+          },
+          targetAudience: 'Nhân viên văn phòng cần máy toàn diện, siêu mỏng 6.9mm, khung kim loại sang trọng.',
+          reviewerNote: 'Độ mỏng kỷ lục 6.9mm trên dòng Galaxy A cùng mặt lưng kính Gorilla Glass Victus+ cầm rất sang.'
+        },
+        {
+          id: 'galaxy-a37-5g',
+          name: 'Samsung Galaxy A37 5G',
+          brandId: 'samsung',
+          price: 10590000,
+          releaseDate: '2026-03-15',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/samsung-galaxy-a37-5g-6gb-128gb',
+          criteria: ['design', 'battery'],
+          scores: { performance: 82, camera: 83, battery: 88, design: 87 },
+          specs: {
+            chip: 'Exynos 1480 8 nhân',
+            ramStorage: '6GB / 128GB',
+            display: '6.7" Super AMOLED FHD+ 120Hz',
+            camera: '50MP OIS + 8MP + 5MP',
+            battery: '5000mAh • Sạc nhanh 45W'
+          },
+          targetAudience: 'Khách hàng tầm trung ưu tiên thương hiệu lớn, bảo hành rộng khắp và chống nước IP67.',
+          reviewerNote: 'Màn hình 6.7 inch rực rỡ và độ bền chuẩn IP67 đặc trưng của dòng Galaxy A.'
+        },
+        {
+          id: 'galaxy-s26-ultra',
+          name: 'Samsung Galaxy S26 Ultra 5G',
+          brandId: 'samsung',
+          price: 31990000,
+          releaseDate: '2026-02-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/samsung-galaxy-s26-ultra-12gb-256gb',
+          criteria: ['performance', 'camera', 'battery', 'design'],
+          scores: { performance: 98, camera: 98, battery: 95, design: 98 },
+          specs: {
+            chip: 'Snapdragon 8 Elite Gen 5 for Galaxy (3nm)',
+            ramStorage: '12GB / 256GB',
+            display: '6.9" QHD+ Dynamic AMOLED 2X Privacy Display',
+            camera: '200MP + Tele 5x + Tele 3x • Quay Log 10-bit',
+            battery: '5500mAh • Sạc nhanh 60W & Bút S Pen'
+          },
+          targetAudience: 'Người dùng quyền lực, thích bút S Pen, zoom xa concert và màn hình chống nhìn trộm.',
+          reviewerNote: 'Tính năng Privacy Display chống nhìn trộm 4 hướng độc quyền cực hữu ích khi mở app ngân hàng.'
+        },
+        {
+          id: 'galaxy-s26-plus',
+          name: 'Samsung Galaxy S26+ 5G',
+          brandId: 'samsung',
+          price: 24690000,
+          releaseDate: '2026-02-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/samsung-galaxy-s26-plus-5g',
+          criteria: ['performance', 'design', 'battery'],
+          scores: { performance: 96, camera: 92, battery: 92, design: 95 },
+          specs: {
+            chip: 'Exynos 2600 (2nm)',
+            ramStorage: '12GB / 256GB',
+            display: '6.7" QHD+ Dynamic AMOLED 2X 2800 nits',
+            camera: '50MP OIS + Tele 3x + 12MP UltraWide',
+            battery: '4900mAh • Sạc nhanh 45W'
+          },
+          targetAudience: 'Khách thích màn hình QHD+ lớn 2800 nits nhưng không cần bút S Pen hay thân máy vuông nặng.',
+          reviewerNote: 'Mỏng nhẹ hơn bản Ultra đáng kể mà vẫn giữ độ phân giải màn hình 2K+ sắc nét.'
+        },
+        {
+          id: 'galaxy-s26',
+          name: 'Samsung Galaxy S26 5G',
+          brandId: 'samsung',
+          price: 20990000,
+          releaseDate: '2026-02-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/samsung-galaxy-s26-5g',
+          criteria: ['design', 'performance', 'camera'],
+          scores: { performance: 95, camera: 91, battery: 84, design: 96 },
+          specs: {
+            chip: 'Exynos 2600 (2nm)',
+            ramStorage: '12GB / 256GB',
+            display: '6.3" FHD+ Dynamic AMOLED 2X 120Hz',
+            camera: '50MP OIS + Tele 3x + 12MP UltraWide',
+            battery: '4300mAh • Sạc nhanh 25W'
+          },
+          targetAudience: 'Khách thích flagship Android nhỏ gọn bỏ túi áo, thao tác một tay cực kỳ thoải mái.',
+          reviewerNote: 'Đối thủ trực tiếp của iPhone 17/Air; lợi thế có thêm ống kính Tele 3x thực thụ.'
+        },
+        {
+          id: 'galaxy-m55-5g-discontinued',
+          name: 'Samsung Galaxy M55 5G',
+          brandId: 'samsung',
+          price: 10190000,
+          releaseDate: '2024-05-15',
+          status: 'Ngừng kinh doanh',
+          criteria: ['battery', 'performance'],
+          scores: { performance: 80, camera: 79, battery: 88, design: 80 },
+          specs: {
+            chip: 'Snapdragon 7 Gen 1',
+            ramStorage: '8GB / 256GB',
+            display: '6.7" Super AMOLED+ 120Hz',
+            camera: '50MP OIS',
+            battery: '5000mAh • Sạc 45W'
+          },
+          targetAudience: 'Đã ngừng kinh doanh tại Thế Giới Di Động.',
+          reviewerNote: 'Bản M55 đã ngừng kinh doanh và không có M56 — tự động loại bỏ khỏi database.'
+        },
+
+        // --- XIAOMI (10 máy đạt chuẩn trong 1 năm) ---
+        {
+          id: 'poco-f9-ultra-5g',
+          name: 'Xiaomi POCO F9 Ultra 5G',
+          brandId: 'xiaomi',
+          price: 23990000,
+          releaseDate: '2026-09-10',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/xiaomi-poco-f9-ultra-5g-12gb-256gb',
+          criteria: ['performance', 'battery'],
+          scores: { performance: 98, camera: 87, battery: 95, design: 89 },
+          specs: {
+            chip: 'Snapdragon 8 Elite Gen 5',
+            ramStorage: '12GB / 256GB',
+            display: '6.9" 2K AMOLED 120Hz',
+            camera: '50MP OIS + Tele 50MP',
+            battery: '6500mAh • Sạc siêu nhanh & Sạc không dây'
+          },
+          targetAudience: 'Game thủ hardcore cày game nặng max setting màn hình lớn 6.9 inch.',
+          reviewerNote: 'Trang bị chip đầu bảng Snapdragon 8 Elite Gen 5 và sạc không dây với giá mềm hơn flagship chính thống.'
+        },
+        {
+          id: 'redmi-note-17-pro-max-5g',
+          name: 'Xiaomi Redmi Note 17 Pro Max 5G',
+          brandId: 'xiaomi',
+          price: 15290000,
+          releaseDate: '2026-08-18',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/xiaomi-redmi-note-17-pro-max-5g-12gb-256gb',
+          criteria: ['battery', 'camera', 'design'],
+          scores: { performance: 87, camera: 89, battery: 96, design: 90 },
+          specs: {
+            chip: 'Snapdragon 6 Gen 5 5G',
+            ramStorage: '12GB / 256GB',
+            display: '6.83" 1.5K AMOLED 120Hz',
+            camera: '200MP OIS + UltraWide',
+            battery: '6800mAh • Sạc siêu nhanh từ 60W'
+          },
+          targetAudience: 'Khách tầm 15 triệu muốn màn hình lớn 1.5K, pin cực trâu và kháng nước bụi toàn diện.',
+          reviewerNote: 'Phiên bản Pro Max đầu tiên của dòng Redmi Note với màn hình lớn và dung lượng pin vượt trội.'
+        },
+        {
+          id: 'redmi-note-17-pro-5g',
+          name: 'Xiaomi Redmi Note 17 Pro 5G',
+          brandId: 'xiaomi',
+          price: 12090000,
+          releaseDate: '2026-08-18',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/xiaomi-redmi-note-17-pro-5g-12gb-256gb',
+          criteria: ['camera', 'battery', 'design'],
+          scores: { performance: 85, camera: 88, battery: 94, design: 89 },
+          specs: {
+            chip: 'Snapdragon 6s Gen 4',
+            ramStorage: '12GB / 256GB',
+            display: '6.83" 1.5K AMOLED 120Hz',
+            camera: '200MP OIS + 8MP UltraWide',
+            battery: '6500mAh • Sạc siêu nhanh từ 60W'
+          },
+          targetAudience: 'Người dùng tầm 12 triệu ưu tiên màn 1.5K sắc nét và camera chính 200MP OIS.',
+          reviewerNote: 'Bản nâng cấp trực tiếp của Redmi Note 15 Pro với màn hình lớn hơn và sạc nhanh từ 60W.'
+        },
+        {
+          id: 'redmi-note-17-5g',
+          name: 'Xiaomi Redmi Note 17 5G',
+          brandId: 'xiaomi',
+          price: 8690000,
+          releaseDate: '2026-08-18',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/xiaomi-redmi-note-17-5g-6gb-128gb',
+          criteria: ['battery', 'design'],
+          scores: { performance: 81, camera: 82, battery: 93, design: 85 },
+          specs: {
+            chip: 'Snapdragon 4 Gen 4 5G',
+            ramStorage: '6GB / 128GB',
+            display: '6.99" FHD+ AMOLED 120Hz',
+            camera: '108MP Siêu nét',
+            battery: '6200mAh • Sạc nhanh 45W'
+          },
+          targetAudience: 'Sinh viên, tài xế công nghệ thích màn hình cực đại gần 7 inch và pin trâu.',
+          reviewerNote: 'Kích thước màn hình 6.99 inch rộng rãi bậc nhất phân khúc dưới 9 triệu.'
+        },
+        {
+          id: 'xiaomi-17t-pro-5g',
+          name: 'Xiaomi 17T Pro 5G',
+          brandId: 'xiaomi',
+          price: 21590000,
+          releaseDate: '2026-05-20',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/xiaomi-17t-pro-5g-12gb-256gb',
+          criteria: ['performance', 'camera', 'battery'],
+          scores: { performance: 96, camera: 93, battery: 94, design: 91 },
+          specs: {
+            chip: 'MediaTek Dimensity 9500',
+            ramStorage: '12GB / 256GB',
+            display: '6.83" 1.5K AMOLED 144Hz',
+            camera: 'Leica 50MP OIS + Tele 50MP',
+            battery: '6000mAh • Sạc siêu nhanh 120W'
+          },
+          targetAudience: 'Khách cần chip flagship Dimensity 9500 và camera Leica tầm 21 triệu.',
+          reviewerNote: 'Hiệu năng ngang ngửa các flagship 30 triệu nhưng mức giá dễ chịu hơn nhiều.'
+        },
+        {
+          id: 'xiaomi-17t-5g',
+          name: 'Xiaomi 17T 5G',
+          brandId: 'xiaomi',
+          price: 17490000,
+          releaseDate: '2026-05-20',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/xiaomi-17t-5g-12gb-256gb',
+          criteria: ['performance', 'camera', 'battery'],
+          scores: { performance: 92, camera: 90, battery: 93, design: 90 },
+          specs: {
+            chip: 'MediaTek Dimensity 8500-Ultra',
+            ramStorage: '12GB / 256GB',
+            display: '6.59" 1.5K AMOLED 120Hz',
+            camera: 'Leica 50MP OIS + Tele 2x',
+            battery: '6000mAh • Sạc siêu nhanh 67W'
+          },
+          targetAudience: 'Khách tầm 17 triệu muốn trải nghiệm màu ảnh Leica và màn hình phẳng 1.5K.',
+          reviewerNote: 'Cân bằng tốt giữa hiệu năng Dimensity 8500-Ultra mát mẻ và cụm camera Leica.'
+        },
+        {
+          id: 'poco-x8-pro-5g',
+          name: 'Xiaomi POCO X8 Pro 5G',
+          brandId: 'xiaomi',
+          price: 11990000,
+          releaseDate: '2026-03-19',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/xiaomi-poco-x8-pro-5g-8gb-256gb',
+          criteria: ['performance', 'battery'],
+          scores: { performance: 93, camera: 82, battery: 95, design: 86 },
+          specs: {
+            chip: 'MediaTek Dimensity 8500-Ultra',
+            ramStorage: '8GB / 256GB',
+            display: '6.59" 1.5K Flow AMOLED 120Hz',
+            camera: '50MP Sony OIS',
+            battery: '6500mAh • Sạc siêu nhanh 90W'
+          },
+          targetAudience: 'Game thủ tầm 12 triệu ưu tiên FPS ổn định và pin khủng 6500mAh.',
+          reviewerNote: 'Vô địch hiệu năng/giá phân khúc 10-15 triệu tại Thế Giới Di Động.'
+        },
+        {
+          id: 'xiaomi-17-ultra-5g',
+          name: 'Xiaomi 17 Ultra 5G',
+          brandId: 'xiaomi',
+          price: 30690000,
+          releaseDate: '2026-02-26',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/xiaomi-17-ultra-5g-16gb-512gb',
+          criteria: ['camera', 'performance', 'battery', 'design'],
+          scores: { performance: 98, camera: 99, battery: 96, design: 95 },
+          specs: {
+            chip: 'Snapdragon 8 Elite Gen 5',
+            ramStorage: '16GB / 512GB',
+            display: '6.9" 2K LTPO AMOLED 3200 nits',
+            camera: 'Leica 1-inch 50MP + Tele tiềm vọng 200MP',
+            battery: '6500mAh Silicon-Carbon • Sạc không dây'
+          },
+          targetAudience: 'Nhiếp ảnh gia di động đam mê chất ảnh Leica Summilux và ống kính tiềm vọng 200MP.',
+          reviewerNote: 'Cảm biến 1-inch thế hệ mới cùng ống kính Tele 200MP cho chất ảnh chân dung & thiếu sáng vượt trội.'
+        },
+        {
+          id: 'xiaomi-17-5g',
+          name: 'Xiaomi 17 5G',
+          brandId: 'xiaomi',
+          price: 19490000,
+          releaseDate: '2026-02-26',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/xiaomi-17-5g-12gb-256gb',
+          criteria: ['performance', 'camera', 'battery', 'design'],
+          scores: { performance: 97, camera: 94, battery: 94, design: 94 },
+          specs: {
+            chip: 'Snapdragon 8 Elite Gen 5',
+            ramStorage: '12GB / 256GB',
+            display: '6.3" 1.5K LTPO OLED 120Hz',
+            camera: 'Bộ 3 Camera Leica 50MP (Chính + UW + Tele)',
+            battery: '6100mAh Silicon-Carbon • Sạc không dây'
+          },
+          targetAudience: 'Khách thích flagship nhỏ gọn 6.3 inch nhưng pin khủng 6100mAh và camera Leica.',
+          reviewerNote: 'Gói gọn viên pin 6100mAh và chip 8 Elite Gen 5 vào thân máy nhỏ gọn 6.3 inch.'
+        },
+        {
+          id: 'redmi-note-15-pro-plus-5g',
+          name: 'Xiaomi Redmi Note 15 Pro+ 5G',
+          brandId: 'xiaomi',
+          price: 10090000,
+          releaseDate: '2026-01-16',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/xiaomi-redmi-note-15-pro-plus-5g-12gb-256gb',
+          criteria: ['battery', 'camera', 'design'],
+          scores: { performance: 85, camera: 87, battery: 95, design: 89 },
+          specs: {
+            chip: 'Snapdragon 7s Gen 4',
+            ramStorage: '12GB / 256GB',
+            display: '6.83" 1.5K AMOLED 120Hz',
+            camera: '200MP OIS + 8MP UltraWide',
+            battery: '6500mAh • Sạc siêu nhanh 90W'
+          },
+          targetAudience: 'Khách tầm 10 triệu muốn màn hình 1.5K sắc nét, pin 6500mAh và kháng nước IP68.',
+          reviewerNote: 'Mức giá giảm sâu còn 10 triệu cực kỳ dễ chốt đơn cho khách cần máy bền bỉ.'
+        },
+
+        // --- OPPO (10 máy đạt chuẩn mới nhất + Find X9 5G ngừng kinh doanh) ---
+        {
+          id: 'oppo-find-x10-pro-max-5g',
+          name: 'OPPO Find X10 Pro Max 5G',
+          brandId: 'oppo',
+          price: 49990000,
+          releaseDate: '2026-10-20',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/oppo-find-x10-pro-max-5g-16gb-512gb',
+          criteria: ['camera', 'performance', 'battery', 'design'],
+          scores: { performance: 99, camera: 99, battery: 97, design: 98 },
+          specs: {
+            chip: 'Dimensity 9600 / Snapdragon 8 Elite Gen 5',
+            ramStorage: '16GB / 512GB',
+            display: '6.82" 2K LTPO AMOLED 120Hz',
+            camera: 'Hasselblad Master 200MP + Dual Tele tiềm vọng',
+            battery: '7000mAh Silicon-Carbon • Sạc 100W'
+          },
+          targetAudience: 'Khách hàng siêu cao cấp muốn flagship đỉnh nhất cuối năm 2026 của OPPO.',
+          reviewerNote: 'Tân vương nhiếp ảnh & pin khủng của nhà OPPO vừa lên kệ TGDĐ.'
+        },
+        {
+          id: 'oppo-find-x10-5g',
+          name: 'OPPO Find X10 5G',
+          brandId: 'oppo',
+          price: 34990000,
+          releaseDate: '2026-10-20',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/oppo-find-x10-5g-12gb-512gb',
+          criteria: ['camera', 'performance', 'battery', 'design'],
+          scores: { performance: 98, camera: 96, battery: 96, design: 96 },
+          specs: {
+            chip: 'Dimensity 9600 (3nm)',
+            ramStorage: '12GB / 512GB',
+            display: '6.59" 1.5K LTPO AMOLED viền siêu mỏng',
+            camera: 'Bộ 3 Camera Hasselblad 50MP OIS',
+            battery: '6800mAh • Sạc SUPERVOOC 80W'
+          },
+          targetAudience: 'Người dùng cao cấp thích flagship cân bằng giữa độ gọn gàng và hiệu năng đầu bảng.',
+          reviewerNote: 'Dung lượng sẵn 512GB cùng hệ thống camera Hasselblad thế hệ mới.'
+        },
+        {
+          id: 'oppo-reno16-pro-5g',
+          name: 'OPPO Reno16 Pro 5G',
+          brandId: 'oppo',
+          price: 23390000,
+          releaseDate: '2026-07-15',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/oppo-reno16-pro-5g-12gb-256gb',
+          criteria: ['camera', 'design', 'battery'],
+          scores: { performance: 92, camera: 95, battery: 95, design: 96 },
+          specs: {
+            chip: 'MediaTek Dimensity 8550 Super 5G',
+            ramStorage: '12GB / 256GB',
+            display: '6.32" 1.5K AMOLED 120Hz nhỏ gọn',
+            camera: 'Chính 200MP OIS + Tele 50MP + UW 50MP',
+            battery: '6700mAh • Sạc SUPERVOOC 80W'
+          },
+          targetAudience: 'Tín đồ chụp chân dung thích máy nhỏ gọn 6.32 inch nhưng pin khủng 6700mAh.',
+          reviewerNote: 'Cảm biến chính nâng lên 200MP và viên pin 6700mAh trong thân máy nhỏ gọn 6.32 inch.'
+        },
+        {
+          id: 'oppo-reno16-5g',
+          name: 'OPPO Reno16 5G',
+          brandId: 'oppo',
+          price: 17090000,
+          releaseDate: '2026-07-15',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/oppo-reno16-5g-8gb-256gb',
+          criteria: ['camera', 'design', 'battery'],
+          scores: { performance: 87, camera: 92, battery: 95, design: 94 },
+          specs: {
+            chip: 'Snapdragon 7 Gen 4',
+            ramStorage: '8GB / 256GB',
+            display: '6.32" 1.5K AMOLED 120Hz',
+            camera: 'Bộ 3 Camera 50MP OIS (Chính + Tele + UW)',
+            battery: '6700mAh • Sạc SUPERVOOC 80W'
+          },
+          targetAudience: 'Khách tầm 17 triệu ưu tiên thiết kế tinh xảo, chân dung AI và pin 6700mAh.',
+          reviewerNote: 'Dòng Reno16 năm nay chuyển sang form nhỏ gọn 6.32 inch cầm cực kỳ sang tay.'
+        },
+        {
+          id: 'oppo-reno16f-5g',
+          name: 'OPPO Reno16F 5G',
+          brandId: 'oppo',
+          price: 14690000,
+          releaseDate: '2026-07-15',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/oppo-reno16f-5g-8gb-128gb',
+          criteria: ['battery', 'design', 'camera'],
+          scores: { performance: 84, camera: 87, battery: 97, design: 91 },
+          specs: {
+            chip: 'MediaTek Dimensity 7300 Energy 5G',
+            ramStorage: '8GB / 128GB',
+            display: '6.57" AMOLED 120Hz',
+            camera: 'Chính 50MP OIS + 50MP + 8MP',
+            battery: '7000mAh • Sạc SUPERVOOC 80W'
+          },
+          targetAudience: 'Người dùng trẻ cần pin siêu trâu 7000mAh trong thân máy Reno mỏng nhẹ.',
+          reviewerNote: 'Viên pin 7000mAh kết hợp sạc nhanh 80W giúp dùng thoải mái hơn 2 ngày.'
+        },
+        {
+          id: 'oppo-find-x9-ultra',
+          name: 'OPPO Find X9 Ultra',
+          brandId: 'oppo',
+          price: 45990000,
+          releaseDate: '2026-05-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/oppo-find-x9-ultra-12gb-512gb',
+          criteria: ['camera', 'performance', 'battery', 'design'],
+          scores: { performance: 98, camera: 99, battery: 97, design: 97 },
+          specs: {
+            chip: 'Snapdragon 8 Elite Gen 5',
+            ramStorage: '12GB / 512GB',
+            display: '6.82" QHD+ 2K+ LTPO AMOLED 120Hz',
+            camera: 'Hasselblad 200MP + Tele 200MP + 50MP + 50MP',
+            battery: '7050mAh • Sạc 80W có dây / 50W không dây'
+          },
+          targetAudience: 'Nhiếp ảnh gia chuyên nghiệp muốn hệ thống camera 200MP kép Hasselblad.',
+          reviewerNote: 'Cụm 4 camera sau với 2 cảm biến 200MP và viên pin 7050mAh cực khủng.'
+        },
+        {
+          id: 'oppo-find-x9s',
+          name: 'OPPO Find X9s',
+          brandId: 'oppo',
+          price: 24990000,
+          releaseDate: '2026-05-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/oppo-find-x9s-12gb-256gb',
+          criteria: ['camera', 'performance', 'battery', 'design'],
+          scores: { performance: 96, camera: 94, battery: 97, design: 95 },
+          specs: {
+            chip: 'MediaTek Dimensity 9500s',
+            ramStorage: '12GB / 256GB',
+            display: '6.59" 1.5K+ AMOLED 120Hz',
+            camera: 'Bộ 3 Camera Hasselblad 50MP',
+            battery: '7025mAh • Sạc SUPERVOOC 80W'
+          },
+          targetAudience: 'Khách tầm 25 triệu muốn flagship pin 7025mAh và camera Hasselblad 3 ống kính 50MP.',
+          reviewerNote: 'Thay thế xứng đáng cho Find X9 tiêu chuẩn với dung lượng pin hơn 7000mAh.'
+        },
+        {
+          id: 'oppo-find-n6-5g',
+          name: 'OPPO Find N6 5G',
+          brandId: 'oppo',
+          price: 64990000,
+          releaseDate: '2026-03-18',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/oppo-find-n6-5g-16gb-512gb',
+          criteria: ['foldable', 'design', 'camera', 'battery'],
+          scores: { performance: 98, camera: 97, battery: 95, design: 99 },
+          specs: {
+            chip: 'Snapdragon 8 Elite Gen 5',
+            ramStorage: '16GB / 512GB',
+            display: 'Chính 8.12" LTPO 120Hz • Phụ 6.62"',
+            camera: 'Hasselblad 200MP + 50MP + 50MP',
+            battery: '6000mAh Silicon-Carbon • Sạc 80W'
+          },
+          targetAudience: 'Doanh nhân siêu sang tìm kiếm điện thoại gập màn hình lớn 8.12 inch và camera 200MP.',
+          reviewerNote: 'Màn hình trong 8.12 inch rộng nhất phân khúc gập ngang cùng viên pin 6000mAh.'
+        },
+        {
+          id: 'oppo-reno15-pro-5g',
+          name: 'OPPO Reno15 Pro 5G',
+          brandId: 'oppo',
+          price: 18490000,
+          releaseDate: '2026-01-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/oppo-reno15-pro-5g-12gb-256gb',
+          criteria: ['camera', 'design', 'battery'],
+          scores: { performance: 90, camera: 94, battery: 93, design: 94 },
+          specs: {
+            chip: 'MediaTek Dimensity 8450 5G',
+            ramStorage: '12GB / 256GB',
+            display: '6.32" 1.5K AMOLED 120Hz',
+            camera: 'Chính 200MP OIS + Tele 50MP + UW 50MP',
+            battery: '6200mAh • Sạc SUPERVOOC 80W'
+          },
+          targetAudience: 'Khách yêu thích chụp ảnh chân dung 200MP và thiết kế nhỏ gọn.',
+          reviewerNote: 'Cấu hình camera 200MP + Tele 50MP rất mạnh trong tầm 18 triệu.'
+        },
+        {
+          id: 'oppo-reno15-5g',
+          name: 'OPPO Reno15 5G',
+          brandId: 'oppo',
+          price: 15990000,
+          releaseDate: '2026-01-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/oppo-reno15-5g-8gb-256gb',
+          criteria: ['camera', 'design', 'battery'],
+          scores: { performance: 86, camera: 90, battery: 94, design: 92 },
+          specs: {
+            chip: 'Snapdragon 7 Gen 4',
+            ramStorage: '8GB / 256GB',
+            display: '6.59" 1.5K AMOLED 120Hz',
+            camera: '50MP OIS + Tele 50MP + 8MP UW',
+            battery: '6500mAh • Sạc SUPERVOOC 80W'
+          },
+          targetAudience: 'Khách hàng tầm 15-16 triệu ưu tiên thiết kế mỏng đẹp, chụp ảnh đẹp và pin 6500mAh.',
+          reviewerNote: 'Rất cân bằng trong dòng Reno với chip Snapdragon 7 Gen 4 mát mẻ.'
+        },
+        {
+          id: 'oppo-find-x9-discontinued',
+          name: 'OPPO Find X9 5G',
+          brandId: 'oppo',
+          price: 22990000,
+          releaseDate: '2025-10-28',
+          status: 'Ngừng kinh doanh',
+          criteria: ['camera', 'performance'],
+          scores: { performance: 95, camera: 94, battery: 95, design: 94 },
+          specs: {
+            chip: 'Dimensity 9500',
+            ramStorage: '12GB / 256GB',
+            display: '6.59" 1.5K+ AMOLED',
+            camera: 'Hasselblad 50MP',
+            battery: '7025mAh'
+          },
+          targetAudience: 'Ngừng kinh doanh tại TGDĐ.',
+          reviewerNote: 'Đã ngừng kinh doanh để nhường chỗ cho Find X9s và Find X10.'
+        },
+
+        // --- VIVO (7 máy đạt chuẩn trong 1 năm) ---
+        {
+          id: 'vivo-x300-ultra',
+          name: 'vivo X300 Ultra',
+          brandId: 'vivo',
+          price: 37990000,
+          releaseDate: '2026-06-18',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/vivo-x300-ultra-16gb-512gb',
+          criteria: ['camera', 'performance', 'battery', 'design'],
+          scores: { performance: 98, camera: 99, battery: 96, design: 96 },
+          specs: {
+            chip: 'Snapdragon 8 Elite Gen 5 + Chip ảnh V4',
+            ramStorage: '16GB / 512GB',
+            display: '6.82" QHD+ 2K LTPO AMOLED 120Hz',
+            camera: 'ZEISS Master 200MP APO Tele + Cảm biến 1-inch',
+            battery: '6800mAh BlueVolt • Sạc 90W'
+          },
+          targetAudience: 'Nhiếp ảnh gia chuyên nghiệp muốn camera ZEISS đầu bảng giới Android.',
+          reviewerNote: 'Hệ thống ống kính ZEISS tiêu cự chuẩn điện ảnh 35mm & 85mm sắc nét từng chi tiết.'
+        },
+        {
+          id: 'vivo-v80-lite-5g',
+          name: 'vivo V80 Lite 5G',
+          brandId: 'vivo',
+          price: 12290000,
+          releaseDate: '2026-08-22',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/vivo-v80-lite-5g-6gb-128gb',
+          criteria: ['design', 'battery', 'camera'],
+          scores: { performance: 83, camera: 87, battery: 94, design: 92 },
+          specs: {
+            chip: 'Snapdragon 7s Gen 4',
+            ramStorage: '6GB / 128GB',
+            display: '6.77" AMOLED 120Hz',
+            camera: '50MP Sony OIS + Vòng sáng Aura AI',
+            battery: '6500mAh BlueVolt • Sạc nhanh 90W'
+          },
+          targetAudience: 'Khách hàng trẻ yêu thích màu hồng tím thời trang, chụp chân dung đêm đẹp.',
+          reviewerNote: 'Thiết kế mỏng nhẹ thời trang đặc trưng dòng V với pin BlueVolt 6500mAh.'
+        },
+        {
+          id: 'vivo-v70',
+          name: 'vivo V70',
+          brandId: 'vivo',
+          price: 13990000,
+          releaseDate: '2026-04-16',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/vivo-v70',
+          criteria: ['camera', 'design', 'battery'],
+          scores: { performance: 87, camera: 93, battery: 95, design: 93 },
+          specs: {
+            chip: 'Snapdragon 7 Gen 4',
+            ramStorage: '12GB / 256GB',
+            display: '6.77" AMOLED 1.5K 120Hz',
+            camera: 'ZEISS OIS 50MP + Tele ZEISS 3x 50MP + Selfie 50MP',
+            battery: '6500mAh BlueVolt • Sạc nhanh 90W'
+          },
+          targetAudience: 'Tín đồ chụp ảnh chân dung du lịch, vlog với bộ 3 camera ZEISS 50MP trước sau.',
+          reviewerNote: 'Trang bị ống kính Tele ZEISS zoom quang 3x và selfie nhóm ZEISS 50MP lấy nét tự động.'
+        },
+        {
+          id: 'vivo-v70-fe',
+          name: 'vivo V70 FE',
+          brandId: 'vivo',
+          price: 10990000,
+          releaseDate: '2026-04-16',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/vivo-v70-fe',
+          criteria: ['battery', 'camera', 'design'],
+          scores: { performance: 83, camera: 89, battery: 97, design: 90 },
+          specs: {
+            chip: 'Dimensity 7300 Energy',
+            ramStorage: '8GB / 256GB',
+            display: '6.77" AMOLED 120Hz',
+            camera: '200MP OIS + Vòng sáng Aura',
+            battery: '7000mAh BlueVolt • Sạc nhanh 90W'
+          },
+          targetAudience: 'Khách tầm 11 triệu muốn camera chính 200MP OIS và pin khủng 7000mAh.',
+          reviewerNote: 'Mang cảm biến 200MP OIS xuống dòng V cùng viên pin BlueVolt 7000mAh dùng 2 ngày.'
+        },
+        {
+          id: 'vivo-x300-pro-5g',
+          name: 'vivo X300 Pro 5G',
+          brandId: 'vivo',
+          price: 29990000,
+          releaseDate: '2026-02-26',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/vivo-x300-pro-5g-16gb-512gb',
+          criteria: ['camera', 'performance', 'battery', 'design'],
+          scores: { performance: 97, camera: 98, battery: 95, design: 95 },
+          specs: {
+            chip: 'Dimensity 9500 (3nm)',
+            ramStorage: '16GB / 512GB',
+            display: '6.78" 1.5K LTPO AMOLED 120Hz',
+            camera: 'ZEISS APO Tele 200MP + Chính 50MP OIS',
+            battery: '6510mAh BlueVolt • Sạc 90W'
+          },
+          targetAudience: 'Người đam mê chụp ảnh chân dung xóa phông & tele macro siêu nét.',
+          reviewerNote: 'Ống kính ZEISS APO 200MP chụp chân dung 85mm/135mm có độ nổi khối hàng đầu thị trường.'
+        },
+        {
+          id: 'vivo-y31d',
+          name: 'vivo Y31d',
+          brandId: 'vivo',
+          price: 6490000,
+          releaseDate: '2026-03-14',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/vivo-y31d',
+          criteria: ['battery'],
+          scores: { performance: 76, camera: 78, battery: 98, design: 83 },
+          specs: {
+            chip: 'Snapdragon 6s Gen 3',
+            ramStorage: '8GB / 256GB',
+            display: '6.75" 120Hz',
+            camera: '50MP Chính AI',
+            battery: '7200mAh BlueVolt • Sạc 44W • IP68/IP69+'
+          },
+          targetAudience: 'Tài xế công nghệ, shipper cần pin siêu khủng 7200mAh và chống nước IP69+.',
+          reviewerNote: 'Viên pin BlueVolt 7200mAh và chuẩn kháng nước IP69+ cực kỳ bền bỉ trong tầm giá 6.5 triệu.'
+        },
+        {
+          id: 'vivo-y21d',
+          name: 'vivo Y21d',
+          brandId: 'vivo',
+          price: 5290000,
+          releaseDate: '2026-01-22',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/vivo-y21d-4gb-128gb',
+          criteria: ['battery'],
+          scores: { performance: 73, camera: 75, battery: 92, design: 80 },
+          specs: {
+            chip: 'Helio G91-Ultra',
+            ramStorage: '4GB / 128GB',
+            display: '6.68" 90Hz',
+            camera: '50MP AI',
+            battery: '6000mAh • Sạc nhanh 44W'
+          },
+          targetAudience: 'Học sinh, phụ huynh cần smartphone cơ bản bền bỉ, pin 6000mAh tầm 5 triệu.',
+          reviewerNote: 'OriginOS 6 mượt mà cùng pin 6000mAh dễ dùng cho người lớn tuổi.'
+        },
+
+        // --- REALME (7 máy đạt chuẩn trong 1 năm) ---
+        {
+          id: 'realme-16-5g',
+          name: 'realme 16 5G',
+          brandId: 'realme',
+          price: 13590000,
+          releaseDate: '2026-09-10',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/realme-16-5g-8gb-256gb',
+          criteria: ['battery', 'performance', 'design'],
+          scores: { performance: 87, camera: 86, battery: 96, design: 90 },
+          specs: {
+            chip: 'Dimensity 7400 5G (4nm)',
+            ramStorage: '8GB / 256GB',
+            display: '6.57" FHD+ AMOLED 120Hz',
+            camera: '50MP Sony LYT-600 OIS',
+            battery: '7000mAh Titan • Sạc nhanh SUPERVOOC 80W'
+          },
+          targetAudience: 'Khách hàng tầm 13-14 triệu cần smartphone 5G gọn gàng 6.57 inch, pin 7000mAh & IP69.',
+          reviewerNote: 'Kích thước 6.57 inch vừa tay nhưng sở hữu viên pin Titan 7000mAh và sạc 80W.'
+        },
+        {
+          id: 'realme-16-pro-5g',
+          name: 'realme 16 Pro 5G',
+          brandId: 'realme',
+          price: 13090000,
+          releaseDate: '2026-08-25',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/realme-16-pro-5g-12gb-256gb',
+          criteria: ['camera', 'battery', 'design'],
+          scores: { performance: 86, camera: 91, battery: 96, design: 91 },
+          specs: {
+            chip: 'Dimensity 7300-Max',
+            ramStorage: '12GB / 256GB',
+            display: '6.78" 1.5K AMOLED 144Hz',
+            camera: 'LumaColor 200MP OIS',
+            battery: '7000mAh Titan • Sạc nhanh 80W'
+          },
+          targetAudience: 'Người trẻ thích màn hình 144Hz mượt mà, camera 200MP và pin 7000mAh.',
+          reviewerNote: 'Camera LumaColor 200MP sắc nét cùng màn 1.5K 144Hz rất nổi bật ở phân khúc 13 triệu.'
+        },
+        {
+          id: 'realme-p4-power-5g',
+          name: 'realme P4 Power 5G',
+          brandId: 'realme',
+          price: 12490000,
+          releaseDate: '2026-07-18',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/realme-p4-power-5g-12gb-256gb',
+          criteria: ['battery', 'performance'],
+          scores: { performance: 88, camera: 84, battery: 100, design: 86 },
+          specs: {
+            chip: 'Dimensity 7400 Ultra',
+            ramStorage: '12GB / 256GB',
+            display: '6.8" HyperGlow 1.5K 144Hz',
+            camera: '50MP Sony OIS',
+            battery: '10.001mAh Titan • Sạc siêu nhanh 80W'
+          },
+          targetAudience: 'Người di chuyển liên tục, cày game/xem phim cần pin khủng nhất thế giới 10.001mAh.',
+          reviewerNote: 'Viên pin Titan kỷ lục 10.001mAh dùng 3-4 ngày mới phải sạc lại.'
+        },
+        {
+          id: 'realme-16t-5g',
+          name: 'realme 16T 5G',
+          brandId: 'realme',
+          price: 10790000,
+          releaseDate: '2026-07-11',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/realme-16t-5g-8gb-128gb',
+          criteria: ['battery', 'performance'],
+          scores: { performance: 84, camera: 82, battery: 95, design: 86 },
+          specs: {
+            chip: 'Dimensity 7300 Energy 5G',
+            ramStorage: '8GB / 128GB',
+            display: '6.8" 120Hz',
+            camera: '50MP AI OIS',
+            battery: '7000mAh • Sạc nhanh 60W'
+          },
+          targetAudience: 'Sinh viên, nhân viên văn phòng cần máy 5G màn lớn, pin 7000mAh tầm 10-11 triệu.',
+          reviewerNote: 'Tối ưu thời lượng pin và độ bền kháng nước bụi tốt.'
+        },
+        {
+          id: 'realme-c100-4g',
+          name: 'realme C100 4G',
+          brandId: 'realme',
+          price: 8890000,
+          releaseDate: '2026-06-08',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/realme-c100-4g-8gb-128gb',
+          criteria: ['battery'],
+          scores: { performance: 78, camera: 78, battery: 98, design: 83 },
+          specs: {
+            chip: 'Helio G100-Ultra',
+            ramStorage: '8GB / 128GB',
+            display: '6.8" 120Hz',
+            camera: '50MP AI',
+            battery: '8000mAh Titan • Sạc nhanh 45W'
+          },
+          targetAudience: 'Khách cần pin 8000mAh dùng 3 ngày trong phân khúc dưới 9 triệu.',
+          reviewerNote: 'Dung lượng pin 8000mAh lớn hàng đầu phân khúc phổ thông.'
+        },
+        {
+          id: 'realme-c85-5g',
+          name: 'realme C85 5G',
+          brandId: 'realme',
+          price: 6480000,
+          releaseDate: '2026-04-04',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/realme-c85-5g-8gb-128gb',
+          criteria: ['battery'],
+          scores: { performance: 77, camera: 76, battery: 97, design: 82 },
+          specs: {
+            chip: 'Dimensity 6300 5G',
+            ramStorage: '8GB / 128GB',
+            display: '6.8" 120Hz',
+            camera: '50MP AI',
+            battery: '7000mAh Titan • Kháng nước IP69'
+          },
+          targetAudience: 'Shipper, tài xế xe ôm công nghệ cần máy 5G pin 7000mAh & chống nước IP69 giá 6.5 triệu.',
+          reviewerNote: 'Combo pin 7000mAh + chuẩn IP69 chịu tia nước áp lực cao cực kỳ thực dụng.'
+        },
+        {
+          id: 'realme-note-80',
+          name: 'realme Note 80',
+          brandId: 'realme',
+          price: 4490000,
+          releaseDate: '2026-02-19',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/realme-note-80-4gb-64gb',
+          criteria: ['battery'],
+          scores: { performance: 71, camera: 73, battery: 91, design: 79 },
+          specs: {
+            chip: 'Unisoc T7250',
+            ramStorage: '4GB / 64GB',
+            display: '6.74" 90Hz',
+            camera: '32MP AI',
+            battery: '6000mAh • Khung ArmorShell'
+          },
+          targetAudience: 'Học sinh, người lớn tuổi cần smartphone cơ bản bền bỉ dưới 4.5 triệu.',
+          reviewerNote: 'Khung gia cố chống cong vênh và va đập tốt.'
+        },
+
+        // --- HONOR (6 máy đạt chuẩn trong 1 năm) ---
+        {
+          id: 'honor-magic-v5-5g',
+          name: 'HONOR Magic V5 5G',
+          brandId: 'honor',
+          price: 36990000,
+          releaseDate: '2026-08-19',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/honor-magic-v5-5g-16gb-512gb',
+          criteria: ['foldable', 'design', 'battery', 'performance'],
+          scores: { performance: 97, camera: 93, battery: 94, design: 99 },
+          specs: {
+            chip: 'Snapdragon 8 Elite',
+            ramStorage: '16GB / 512GB',
+            display: 'Chính 7.95" LTPO 120Hz • Phụ 6.43" Siêu mỏng',
+            camera: '50MP Falcon + Tele tiềm vọng 50MP',
+            battery: '5820mAh Silicon-Carbon • Sạc 66W'
+          },
+          targetAudience: 'Doanh nhân thích máy gập ngang siêu mỏng nhẹ như điện thoại thanh.',
+          reviewerNote: 'Thiết kế mỏng nhẹ bậc nhất phân khúc gập ngang cùng pin Silicon-Carbon dung lượng lớn.'
+        },
+        {
+          id: 'honor-600',
+          name: 'HONOR 600',
+          brandId: 'honor',
+          price: 15440000,
+          releaseDate: '2026-06-15',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/honor-600-8gb-256gb',
+          criteria: ['camera', 'battery', 'design'],
+          scores: { performance: 89, camera: 92, battery: 97, design: 92 },
+          specs: {
+            chip: 'Snapdragon 7 Gen 4',
+            ramStorage: '8GB / 256GB',
+            display: '6.57" 1.5K OLED PWM 3840Hz',
+            camera: 'Chính 200MP OIS + Phụ 12MP',
+            battery: '7000mAh Silicon-Carbon • Sạc nhanh 80W'
+          },
+          targetAudience: 'Khách tầm 15.5 triệu cần camera 200MP, pin khủng 7000mAh và màn hình chống mỏi mắt.',
+          reviewerNote: 'Gói gọn pin 7000mAh trong thân máy 6.57 inch gọn gàng, chụp chân dung AI cực đẹp.'
+        },
+        {
+          id: 'honor-600-lite',
+          name: 'HONOR 600 Lite',
+          brandId: 'honor',
+          price: 9290000,
+          releaseDate: '2026-06-15',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/honor-600-lite-8gb-256gb',
+          criteria: ['design', 'battery'],
+          scores: { performance: 81, camera: 84, battery: 92, design: 89 },
+          specs: {
+            chip: 'Dimensity 7025-Ultra',
+            ramStorage: '8GB / 256GB',
+            display: '6.6" 1.5K AMOLED 120Hz',
+            camera: '108MP Siêu nét',
+            battery: '6000mAh • Sạc nhanh 45W'
+          },
+          targetAudience: 'Sinh viên, nhân viên trẻ thích màn 1.5K viền mỏng và thiết kế thanh lịch dưới 9.5 triệu.',
+          reviewerNote: 'Màn hình 1.5K sắc nét hiếm thấy ở phân khúc 9 triệu.'
+        },
+        {
+          id: 'honor-x8d',
+          name: 'HONOR X8d',
+          brandId: 'honor',
+          price: 7190000,
+          releaseDate: '2026-04-10',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/honor-x8d-8gb-128gb',
+          criteria: ['battery', 'design'],
+          scores: { performance: 78, camera: 80, battery: 94, design: 85 },
+          specs: {
+            chip: 'Snapdragon 685+',
+            ramStorage: '8GB / 128GB',
+            display: '6.77" FHD+ AMOLED 120Hz',
+            camera: '108MP Siêu nét',
+            battery: '6500mAh • Sạc nhanh 35W'
+          },
+          targetAudience: 'Khách tầm 7 triệu muốn màn AMOLED Full HD+ sáng đẹp và pin 6500mAh.',
+          reviewerNote: 'Độ bền chống rơi vỡ chuẩn SGS 5 sao, rất an tâm khi sử dụng hàng ngày.'
+        },
+        {
+          id: 'honor-x7d-5g',
+          name: 'HONOR X7d 5G',
+          brandId: 'honor',
+          price: 6690000,
+          releaseDate: '2026-03-08',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/honor-x7d-5g-8gb-256gb',
+          criteria: ['battery'],
+          scores: { performance: 76, camera: 78, battery: 94, design: 81 },
+          specs: {
+            chip: 'Snapdragon 6s Gen 3 5G',
+            ramStorage: '8GB / 256GB',
+            display: '6.77" 120Hz',
+            camera: '108MP Chính AI',
+            battery: '6500mAh • Sạc nhanh 35W'
+          },
+          targetAudience: 'Khách cần máy 5G bộ nhớ 256GB và pin 6500mAh trong tầm giá dưới 7 triệu.',
+          reviewerNote: 'Bộ nhớ sẵn 256GB thoải mái lưu trữ hình ảnh, video.'
+        },
+        {
+          id: 'honor-x9d-5g',
+          name: 'HONOR X9d 5G',
+          brandId: 'honor',
+          price: 11980000,
+          releaseDate: '2025-12-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/honor-x9d-5g-12gb-256gb',
+          criteria: ['battery', 'design'],
+          scores: { performance: 82, camera: 83, battery: 99, design: 90 },
+          specs: {
+            chip: 'Snapdragon 6 Gen 4',
+            ramStorage: '12GB / 256GB',
+            display: '6.79" 1.5K OLED 120Hz PWM 3840Hz',
+            camera: '108MP OIS + 5MP',
+            battery: '8300mAh Silicon-Carbon • Sạc 66W'
+          },
+          targetAudience: 'Khách hay làm rơi điện thoại, cần màn hình siêu bền & pin 8300mAh dùng 3 ngày.',
+          reviewerNote: 'Quái vật pin 8300mAh kết hợp màn hình 1.5K OLED chống va đập cực kỳ bền bỉ.'
+        },
+
+        // --- TECNO (4 máy đạt chuẩn trong 1 năm) ---
+        {
+          id: 'tecno-pova-curve-2-5g',
+          name: 'TECNO POVA Curve 2 5G',
+          brandId: 'tecno',
+          price: 8190000,
+          releaseDate: '2026-07-22',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/tecno-pova-curve-2-5g',
+          criteria: ['battery', 'design', 'performance'],
+          scores: { performance: 84, camera: 80, battery: 99, design: 90 },
+          specs: {
+            chip: 'Dimensity 7300 Ultimate 5G',
+            ramStorage: '8GB / 128GB',
+            display: '6.78" FHD+ AMOLED cong 144Hz',
+            camera: '50MP Sony OIS',
+            battery: '8000mAh • Siêu mỏng chỉ 7.42mm • Sạc 70W'
+          },
+          targetAudience: 'Sinh viên, game thủ thích màn hình cong 144Hz siêu mỏng 7.42mm nhưng pin tới 8000mAh.',
+          reviewerNote: 'Nghịch lý công nghệ: nhét viên pin 8000mAh vào thân máy cong mỏng chỉ 7.42mm!'
+        },
+        {
+          id: 'tecno-spark-50-pro',
+          name: 'TECNO Spark 50 Pro',
+          brandId: 'tecno',
+          price: 6090000,
+          releaseDate: '2026-06-15',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/tecno-spark-50-pro-4gb-128gb',
+          criteria: ['battery', 'design'],
+          scores: { performance: 77, camera: 79, battery: 93, design: 85 },
+          specs: {
+            chip: 'Helio G100 Ultimate',
+            ramStorage: '4GB / 128GB',
+            display: '6.78" 120Hz Gorilla Glass 7i',
+            camera: '50MP Siêu nét',
+            battery: '6000mAh • Sạc siêu nhanh 60W • IP68/IP69'
+          },
+          targetAudience: 'Tài xế xe công nghệ, shipper thường xuyên đi mưa cần sạc nhanh 60W và IP69.',
+          reviewerNote: 'Đạt chuẩn kháng nước áp lực cao IP69 và sạc nhanh 60W cực kỳ hữu ích khi chạy ngoài trời.'
+        },
+        {
+          id: 'tecno-spark-50',
+          name: 'TECNO Spark 50',
+          brandId: 'tecno',
+          price: 4590000,
+          releaseDate: '2026-05-10',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/tecno-spark-50-4gb-128gb',
+          criteria: ['battery'],
+          scores: { performance: 73, camera: 75, battery: 90, design: 81 },
+          specs: {
+            chip: 'Helio G91',
+            ramStorage: '4GB / 128GB',
+            display: '6.78" 120Hz',
+            camera: '50MP AI',
+            battery: '5500mAh • Sạc nhanh 33W • Chống rơi SGS'
+          },
+          targetAudience: 'Học sinh, người lao động cần máy màn lớn, chống va đập tốt tầm 4.5 triệu.',
+          reviewerNote: 'Đạt chuẩn chống rơi vỡ SGS Thụy Sĩ 1.5m và pin tuổi thọ 5 năm.'
+        },
+        {
+          id: 'tecno-spark-go-3',
+          name: 'TECNO Spark Go 3',
+          brandId: 'tecno',
+          price: 3340000,
+          releaseDate: '2026-03-25',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/tecno-spark-go-3-4gb-64gb',
+          criteria: ['battery'],
+          scores: { performance: 69, camera: 70, battery: 89, design: 78 },
+          specs: {
+            chip: 'Unisoc T615',
+            ramStorage: '4GB / 64GB',
+            display: '6.75" 120Hz',
+            camera: '13MP AI Dual Flash',
+            battery: '5000mAh • Kháng bụi nước IP64'
+          },
+          targetAudience: 'Phụ huynh mua cho con nhỏ, người lớn tuổi cần máy nghe gọi Zalo/YouTube hơn 3 triệu.',
+          reviewerNote: 'Mức giá dễ tiếp cận nhất của TECNO với màn hình 120Hz mượt mà.'
+        },
+
+        // --- NUBIA (4 máy đạt chuẩn trong 1 năm — đã sửa đúng tên nubia Neo 5 GT 5G) ---
+        {
+          id: 'nubia-neo-5-gt-5g',
+          name: 'nubia Neo 5 GT 5G',
+          brandId: 'nubia',
+          price: 6990000,
+          releaseDate: '2026-06-20',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/nubia-neo-5-gt-5g',
+          criteria: ['performance', 'battery'],
+          scores: { performance: 87, camera: 77, battery: 94, design: 87 },
+          specs: {
+            chip: 'Unisoc T9100 5G (6nm)',
+            ramStorage: '12GB / 256GB',
+            display: '6.78" FHD+ OLED 120Hz',
+            camera: '50MP AI Dual',
+            battery: '6000mAh • Sạc nhanh 80W + Phím Trigger'
+          },
+          targetAudience: 'Game thủ PUBG, Free Fire ngân sách 7 triệu cần phím cò vai (Shoulder Triggers) vật lý.',
+          reviewerNote: 'Thế hệ nubia Neo 5 GT mới nhất trang bị cặp phím trigger cảm ứng chuyên dụng và sạc nhanh 80W.'
+        },
+        {
+          id: 'nubia-air-5g',
+          name: 'nubia Air 5G',
+          brandId: 'nubia',
+          price: 5990000,
+          releaseDate: '2026-05-12',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/nubia-air-5g-8gb-256gb',
+          criteria: ['design', 'battery'],
+          scores: { performance: 79, camera: 80, battery: 88, design: 92 },
+          specs: {
+            chip: 'Unisoc T8300 5G',
+            ramStorage: '8GB / 256GB',
+            display: '6.78" 1.5K AMOLED 120Hz 4500 nits',
+            camera: '50MP AI Triple • Selfie 20MP',
+            battery: '5000mAh • Mỏng 6.7mm (172g) • IP68/IP69'
+          },
+          targetAudience: 'Khách thích dáng siêu mỏng nhẹ 6.7mm như iPhone Air nhưng ngân sách tầm 6 triệu.',
+          reviewerNote: 'Màn hình 1.5K AMOLED 4500 nits và chuẩn chống nước IP69 trong thân máy mỏng 6.7mm cực kỳ ấn tượng.'
+        },
+        {
+          id: 'nubia-v80-max',
+          name: 'nubia V80 Max',
+          brandId: 'nubia',
+          price: 3770000,
+          releaseDate: '2026-03-18',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/nubia-v80-max-6gb-128gb',
+          criteria: ['battery'],
+          scores: { performance: 71, camera: 73, battery: 92, design: 79 },
+          specs: {
+            chip: 'Unisoc T606+',
+            ramStorage: '6GB / 128GB',
+            display: '6.9" 120Hz',
+            camera: '50MP AI',
+            battery: '6000mAh • Hỗ trợ NFC'
+          },
+          targetAudience: 'Người lớn tuổi, tài xế cần màn hình siêu lớn 6.9 inch, có NFC giá dưới 4 triệu.',
+          reviewerNote: 'Hiếm có máy dưới 4 triệu nào tích hợp sẵn NFC quét căn cước công dân mượt mà như V80 Max.'
+        },
+        {
+          id: 'nubia-v80-design',
+          name: 'nubia V80 Design',
+          brandId: 'nubia',
+          price: 3570000,
+          releaseDate: '2026-03-18',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/nubia-v80-design-4gb-128gb',
+          criteria: ['design'],
+          scores: { performance: 70, camera: 73, battery: 87, design: 84 },
+          specs: {
+            chip: 'Unisoc T606+',
+            ramStorage: '4GB / 128GB',
+            display: '6.75" 120Hz',
+            camera: '50MP AI',
+            battery: '5000mAh • Hỗ trợ NFC'
+          },
+          targetAudience: 'Học sinh cần smartphone thiết kế đẹp, có NFC và bộ nhớ 128GB hơn 3.5 triệu.',
+          reviewerNote: 'Hoàn thiện mặt lưng sang trọng vượt tầm giá phổ thông.'
+        },
+
+        // --- MOTOROLA (6 máy đạt chuẩn trong 1 năm) ---
+        {
+          id: 'motorola-razr-fold-5g',
+          name: 'Motorola Razr Fold 5G',
+          brandId: 'motorola',
+          price: 39990000,
+          releaseDate: '2026-08-25',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/motorola-razr-fold-5g-12gb-256gb',
+          criteria: ['foldable', 'design', 'performance'],
+          scores: { performance: 96, camera: 92, battery: 90, design: 98 },
+          specs: {
+            chip: 'Snapdragon 8 Elite Gen 5',
+            ramStorage: '12GB / 256GB',
+            display: 'Chính 8.0" QHD+ 2K LTPO 120Hz',
+            camera: 'Bộ 3 Camera 50MP OIS + Tele 3x',
+            battery: '5400mAh • Sạc nhanh 68W'
+          },
+          targetAudience: 'Doanh nhân thích điện thoại gập ngang màn 2K với giao diện Android thuần mượt mà.',
+          reviewerNote: 'Mẫu gập ngang đầu tiên của Motorola mang trải nghiệm Hello UI không quảng cáo rác.'
+        },
+        {
+          id: 'motorola-signature',
+          name: 'Motorola Signature',
+          brandId: 'motorola',
+          price: 20990000,
+          releaseDate: '2026-07-08',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/motorola-signature-12gb-256gb',
+          criteria: ['design', 'performance', 'camera'],
+          scores: { performance: 94, camera: 91, battery: 91, design: 95 },
+          specs: {
+            chip: 'Snapdragon 8 Gen 5',
+            ramStorage: '12GB / 256GB',
+            display: '6.8" 1.5K+ pOLED 144Hz chuẩn màu Pantone',
+            camera: '50MP Sony LYT-818 OIS + Tele 3x',
+            battery: '5800mAh • Sạc nhanh 90W'
+          },
+          targetAudience: 'Khách tầm 21 triệu yêu thích thiết kế tinh xảo, màn hình Pantone và chip Snapdragon đầu 8.',
+          reviewerNote: 'Dòng flagship mới của Motorola mang lại cảm giác cầm nắm cực kỳ cao cấp và Android sạch.'
+        },
+        {
+          id: 'motorola-razr-60-5g',
+          name: 'Motorola Razr 60 5G',
+          brandId: 'motorola',
+          price: 17990000,
+          releaseDate: '2026-06-15',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/motorola-razr-60-5g-8gb-256gb',
+          criteria: ['foldable', 'design'],
+          scores: { performance: 87, camera: 86, battery: 86, design: 96 },
+          specs: {
+            chip: 'Dimensity 7400X',
+            ramStorage: '8GB / 256GB',
+            display: 'Chính 6.9" FHD+ LTPO 120Hz • Phụ 3.6" pOLED',
+            camera: '50MP OIS + 13MP UltraWide',
+            battery: '4500mAh • Sạc nhanh 30W'
+          },
+          targetAudience: 'Khách trẻ muốn sở hữu điện thoại gập vỏ sò thời trang với ngân sách dưới 18 triệu.',
+          reviewerNote: 'Mức giá dễ tiếp cận nhất trong phân khúc điện thoại gập mới ra mắt năm 2026.'
+        },
+        {
+          id: 'motorola-edge-70',
+          name: 'Motorola Edge 70',
+          brandId: 'motorola',
+          price: 12990000,
+          releaseDate: '2026-05-14',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/motorola-edge-70-8gb-256gb',
+          criteria: ['design', 'performance', 'battery'],
+          scores: { performance: 90, camera: 88, battery: 92, design: 94 },
+          specs: {
+            chip: 'Snapdragon 7 Gen 4',
+            ramStorage: '8GB / 256GB',
+            display: '6.67" 1.5K pOLED 144Hz Pantone',
+            camera: '50MP Sony OIS + Tele 3x',
+            battery: '5800mAh • Sạc nhanh 68W • IP68/IP69'
+          },
+          targetAudience: 'Người dùng thích màn hình chuẩn màu Pantone, mặt lưng da thuần chay và Android sạch.',
+          reviewerNote: 'Siêu mỏng nhẹ và đạt chuẩn bền quân đội MIL-STD-810H.'
+        },
+        {
+          id: 'motorola-edge-70-fusion',
+          name: 'Motorola Edge 70 Fusion',
+          brandId: 'motorola',
+          price: 10990000,
+          releaseDate: '2026-05-14',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/motorola-edge-70-fusion-8gb-128gb',
+          criteria: ['design', 'battery'],
+          scores: { performance: 85, camera: 85, battery: 93, design: 92 },
+          specs: {
+            chip: 'Dimensity 7400',
+            ramStorage: '8GB / 128GB',
+            display: '6.78" 1.5K pOLED cong 144Hz',
+            camera: '50MP Sony LYT-700C OIS',
+            battery: '6000mAh • Sạc nhanh 68W'
+          },
+          targetAudience: 'Khách tầm 11 triệu thích màn cong 144Hz mềm mại và giao diện thuần Google.',
+          reviewerNote: 'Cảm giác vuốt chạm trên màn cong 1.5K 144Hz cực kỳ mượt mà.'
+        },
+        {
+          id: 'motorola-g57-power-5g',
+          name: 'Motorola G57 Power 5G',
+          brandId: 'motorola',
+          price: 6790000,
+          releaseDate: '2026-04-17',
+          status: 'Đang kinh doanh',
+          tgddUrl: 'https://www.thegioididong.com/dtdd/motorola-g57-power-5g-8gb-128gb',
+          criteria: ['battery'],
+          scores: { performance: 79, camera: 79, battery: 96, design: 83 },
+          specs: {
+            chip: 'Dimensity 7060 5G',
+            ramStorage: '8GB / 128GB',
+            display: '6.72" FHD+ 120Hz',
+            camera: '50MP Sony OIS',
+            battery: '6500mAh • Sạc nhanh 33W • Loa Dolby Atmos'
+          },
+          targetAudience: 'Khách tìm máy 5G tầm 6.8 triệu pin trâu 6500mAh và phần mềm không quảng cáo rác.',
+          reviewerNote: 'Giao diện Hello UI sạch sẽ, rất mượt cho người lớn tuổi và tài xế.'
+        },
+
+        // --- ASUS (1 máy ngừng kinh doanh -> minh chứng tự động xóa hãng khỏi trang chủ) ---
+        {
+          id: 'asus-rog-phone-9-discontinued',
+          name: 'ASUS ROG Phone 9',
+          brandId: 'asus',
+          price: 24990000,
+          releaseDate: '2026-01-10',
+          status: 'Ngừng kinh doanh',
+          criteria: ['performance'],
+          scores: { performance: 98, camera: 82, battery: 94, design: 90 },
+          specs: {
+            chip: 'Snapdragon 8 Elite',
+            ramStorage: '16GB / 512GB',
+            display: '6.78" AMOLED 185Hz',
+            camera: '50MP Gimbal OIS',
+            battery: '5800mAh'
+          },
+          targetAudience: 'Ngừng kinh doanh tại TGDĐ.',
+          reviewerNote: 'Vì ASUS không còn mẫu máy nào đang kinh doanh, hãng tự động ẩn khỏi trang chủ & database.'
+        }
+      ];
+
+      /**
+       * =========================================================================
+       * MODULE 3: ENGINE KIỂM DUYỆT DATABASE 3 TIÊU CHÍ BẮT BUỘC
+       * =========================================================================
+       */
+      function isWithinOneYear(releaseDateStr) {
+        if (!releaseDateStr) return false;
+        const releaseTs = new Date(releaseDateStr + 'T00:00:00').getTime();
+        const minTs = new Date(MIN_RELEASE_DATE + 'T00:00:00').getTime();
+        const maxTs = new Date(REFERENCE_DATE + 'T23:59:59').getTime();
+        return !Number.isNaN(releaseTs) && releaseTs >= minTs && releaseTs <= maxTs;
+      }
+
+      function curatePhoneDatabase(rawList) {
+        const logs = [];
+        const validBeforeCap = [];
+
+        // Bước 1 & 2: Kiểm tra thời hạn 1 năm (16/11/2025 - 16/11/2026) và trạng thái "Đang kinh doanh"
+        rawList.forEach((phone) => {
+          if (phone.status !== 'Đang kinh doanh') {
+            logs.push({
+              id: phone.id,
+              name: phone.name,
+              brandId: phone.brandId,
+              reason: 'Trạng thái "Ngừng kinh doanh" → Đã tự động xóa khỏi database.'
+            });
+            return;
+          }
+          if (!isWithinOneYear(phone.releaseDate)) {
+            logs.push({
+              id: phone.id,
+              name: phone.name,
+              brandId: phone.brandId,
+              reason: `Ngày ra mắt (${formatDateVN(phone.releaseDate)}) quá 1 năm tính tới 16/11/2026 → Đã loại.`
+            });
+            return;
+          }
+          validBeforeCap.push(phone);
+        });
+
+        // Bước 3: Mỗi hãng lấy tối đa 10 mẫu mới nhất tính theo ngày sản xuất
+        const groupedByBrand = {};
+        validBeforeCap.forEach((phone) => {
+          if (!groupedByBrand[phone.brandId]) {
+            groupedByBrand[phone.brandId] = [];
+          }
+          groupedByBrand[phone.brandId].push(phone);
+        });
+
+        const approvedPhones = [];
+        const activeBrandIds = new Set();
+
+        Object.keys(groupedByBrand).forEach((brandId) => {
+          const sorted = groupedByBrand[brandId].sort((a, b) => {
+            return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
+          });
+
+          const topModels = sorted.slice(0, MAX_MODELS_PER_BRAND);
+          const overflowModels = sorted.slice(MAX_MODELS_PER_BRAND);
+
+          overflowModels.forEach((extra) => {
+            logs.push({
+              id: extra.id,
+              name: extra.name,
+              brandId: extra.brandId,
+              reason: `Vượt giới hạn ${MAX_MODELS_PER_BRAND} mẫu mới nhất của hãng → Tự động ẩn.`
+            });
+          });
+
+          if (topModels.length > 0) {
+            activeBrandIds.add(brandId);
+            approvedPhones.push(...topModels);
+          }
+        });
+
+        // Sắp xếp danh sách cuối cùng theo ngày ra mắt mới nhất
+        approvedPhones.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
+
+        // Chỉ giữ lại các thương hiệu có ít nhất 1 máy đang kinh doanh
+        const activeBrands = BRANDS_MASTER.filter((b) => activeBrandIds.has(b.id)).map((b) => ({
+          ...b,
+          activeCount: approvedPhones.filter((p) => p.brandId === b.id).length
+        }));
+
+        const hiddenBrands = BRANDS_MASTER.filter((b) => !activeBrandIds.has(b.id));
+
+        return {
+          approvedPhones,
+          activeBrands,
+          hiddenBrands,
+          logs
+        };
+      }
+
+      /**
+       * =========================================================================
+       * MODULE 4: QUẢN LÝ TRẠNG THÁI ỨNG DỤNG & LOCALSTORAGE
+       * =========================================================================
+       */
+      const state = {
+        rawPhones: [],
+        approvedPhones: [],
+        activeBrands: [],
+        hiddenBrands: [],
+        curationLogs: [],
+        searchQuery: '',
+        priceRange: 'all',
+        brandId: 'all',
+        criterion: 'all',
+        sortBy: 'newest',
+        showAllMode: false,
+        rivalTargetPrice: null,
+        rivalReferenceName: '',
+        savedScrollY: 0,
+        lastClickedPhoneId: '',
+        favorites: [],
+        compareList: []
+      };
+
+      function saveViewStateToStorage() {
+        try {
+          const payload = {
+            searchQuery: state.searchQuery,
+            priceRange: state.priceRange,
+            brandId: state.brandId,
+            criterion: state.criterion,
+            sortBy: state.sortBy,
+            showAllMode: state.showAllMode,
+            rivalTargetPrice: state.rivalTargetPrice,
+            rivalReferenceName: state.rivalReferenceName,
+            savedScrollY: state.savedScrollY,
+            lastClickedPhoneId: state.lastClickedPhoneId
+          };
+          localStorage.setItem(STORAGE_KEYS.VIEW_STATE, JSON.stringify(payload));
+        } catch (err) {
+          console.error('Lỗi lưu trạng thái trang:', err);
+        }
+      }
+
+      function loadFromLocalStorage() {
+        try {
+          const savedRaw = localStorage.getItem(STORAGE_KEYS.RAW_PHONES);
+          if (savedRaw) {
+            const parsedRaw = JSON.parse(savedRaw);
+            if (Array.isArray(parsedRaw) && parsedRaw.length > 0) {
+              // Đồng bộ bổ sung URL chi tiết TGDĐ & mẫu mới nếu người dùng đang dùng cache cũ
+              const existingIds = new Set(parsedRaw.map((p) => p.id));
+              const missingDefaults = RAW_PHONES_DEFAULT.filter((d) => !existingIds.has(d.id));
+              state.rawPhones = [...missingDefaults, ...parsedRaw].map((phone) => ({
+                ...phone,
+                tgddUrl: getTgddProductUrl(phone)
+              }));
+            } else {
+              state.rawPhones = structuredClone(RAW_PHONES_DEFAULT).map((phone) => ({
+                ...phone,
+                tgddUrl: getTgddProductUrl(phone)
+              }));
+            }
+          } else {
+            state.rawPhones = structuredClone(RAW_PHONES_DEFAULT).map((phone) => ({
+              ...phone,
+              tgddUrl: getTgddProductUrl(phone)
+            }));
+          }
+
+          const savedFav = localStorage.getItem(STORAGE_KEYS.FAVORITES);
+          state.favorites = savedFav ? JSON.parse(savedFav) : [];
+
+          const savedComp = localStorage.getItem(STORAGE_KEYS.COMPARE);
+          state.compareList = savedComp ? JSON.parse(savedComp) : [];
+
+          const savedViewRaw = localStorage.getItem(STORAGE_KEYS.VIEW_STATE);
+          if (savedViewRaw) {
+            const parsedView = JSON.parse(savedViewRaw);
+            if (parsedView && typeof parsedView === 'object') {
+              state.searchQuery = typeof parsedView.searchQuery === 'string' ? parsedView.searchQuery : '';
+              state.priceRange = typeof parsedView.priceRange === 'string' ? parsedView.priceRange : 'all';
+              state.brandId = typeof parsedView.brandId === 'string' ? parsedView.brandId : 'all';
+              state.criterion = typeof parsedView.criterion === 'string' ? parsedView.criterion : 'all';
+              state.sortBy = typeof parsedView.sortBy === 'string' ? parsedView.sortBy : 'newest';
+              state.showAllMode = Boolean(parsedView.showAllMode);
+              state.rivalTargetPrice = typeof parsedView.rivalTargetPrice === 'number' ? parsedView.rivalTargetPrice : null;
+              state.rivalReferenceName = typeof parsedView.rivalReferenceName === 'string' ? parsedView.rivalReferenceName : '';
+              state.savedScrollY = typeof parsedView.savedScrollY === 'number' ? parsedView.savedScrollY : 0;
+              state.lastClickedPhoneId = typeof parsedView.lastClickedPhoneId === 'string' ? parsedView.lastClickedPhoneId : '';
+            }
+          }
+        } catch (err) {
+          console.error('Lỗi đọc localStorage:', err);
+          state.rawPhones = structuredClone(RAW_PHONES_DEFAULT).map((phone) => ({
+            ...phone,
+            tgddUrl: getTgddProductUrl(phone)
+          }));
+          state.favorites = [];
+          state.compareList = [];
+        }
+      }
+
+      function saveToLocalStorage() {
+        try {
+          localStorage.setItem(STORAGE_KEYS.RAW_PHONES, JSON.stringify(state.rawPhones));
+          localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(state.favorites));
+          localStorage.setItem(STORAGE_KEYS.COMPARE, JSON.stringify(state.compareList));
+        } catch (err) {
+          console.error('Lỗi ghi localStorage:', err);
+        }
+      }
+
+      function syncCuratedState() {
+        const result = curatePhoneDatabase(state.rawPhones);
+        state.approvedPhones = result.approvedPhones;
+        state.activeBrands = result.activeBrands;
+        state.hiddenBrands = result.hiddenBrands;
+        state.curationLogs = result.logs;
+
+        // Đồng bộ danh sách yêu thích & so sánh để loại bỏ máy vừa bị ngừng kinh doanh
+        const approvedIds = new Set(state.approvedPhones.map((p) => p.id));
+        state.favorites = state.favorites.filter((id) => approvedIds.has(id));
+        state.compareList = state.compareList.filter((id) => approvedIds.has(id)).slice(0, 2);
+
+        // Nếu thương hiệu đang chọn không còn máy bán thì tự động đặt về 'all'
+        if (state.brandId !== 'all' && !state.activeBrands.some((b) => b.id === state.brandId)) {
+          state.brandId = 'all';
+          const brandSelectEl = document.getElementById('brandSelect');
+          if (brandSelectEl) brandSelectEl.value = 'all';
+        }
+
+        saveToLocalStorage();
+        updateDashboardStats();
+      }
+
+      /**
+       * =========================================================================
+       * MODULE 5: CÁC HÀM TIỆN ÍCH HIỂN THỊ & TẠO URL ĐÍCH DANH TGDĐ
+       * =========================================================================
+       */
+      function slugifyForTgdd(text) {
+        return String(text || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/đ/g, 'd')
+          .replace(/Đ/g, 'D')
+          .replace(/\+/g, '-plus')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '')
+          .replace(/-{2,}/g, '-');
+      }
+
+      function getTgddProductUrl(phone) {
+        if (!phone) return 'https://www.thegioididong.com/dtdd';
+        if (phone.tgddUrl && phone.tgddUrl.trim().startsWith('http')) {
+          return phone.tgddUrl.trim();
+        }
+
+        const nameSlug = slugifyForTgdd(phone.name);
+        const isBaseSlugModel =
+          phone.brandId === 'apple' ||
+          nameSlug.startsWith('iphone') ||
+          /galaxy-(s26|z-fold|z-flip)|find-n6|magic-v5|razr-60-ultra/.test(nameSlug);
+
+        if (isBaseSlugModel) {
+          return `https://www.thegioididong.com/dtdd/${nameSlug}`;
+        }
+
+        const ramStorageRaw = phone.specs && phone.specs.ramStorage ? phone.specs.ramStorage : '';
+        const memMatch = ramStorageRaw.match(/(\d+\s*gb)\s*\/\s*(\d+\s*(?:gb|tb))/i);
+        if (memMatch) {
+          const ramSlug = memMatch[1].replace(/\s+/g, '').toLowerCase();
+          const romSlug = memMatch[2].replace(/\s+/g, '').toLowerCase();
+          if (!nameSlug.endsWith(`${ramSlug}-${romSlug}`)) {
+            return `https://www.thegioididong.com/dtdd/${nameSlug}-${ramSlug}-${romSlug}`;
+          }
+        }
+
+        return `https://www.thegioididong.com/dtdd/${nameSlug}`;
+      }
+
+      function formatCurrencyVN(amount) {
+        return Number(amount || 0).toLocaleString('vi-VN') + '₫';
+      }
+
+      function formatDateVN(isoDate) {
+        if (!isoDate || !isoDate.includes('-')) return isoDate || '';
+        const parts = isoDate.split('-');
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+
+      function getBrandById(brandId) {
+        return BRANDS_MASTER.find((b) => b.id === brandId) || {
+          id: brandId,
+          name: brandId.toUpperCase(),
+          shortName: brandId.toUpperCase(),
+          tagline: '',
+          accent: '#4f46e5',
+          logoSvg: `<span class="font-extrabold text-slate-900">${brandId.toUpperCase()}</span>`
+        };
+      }
+
+      function matchesPriceRange(price, rangeKey) {
+        if (rangeKey === 'all') return true;
+        if (rangeKey === 'under-5') return price < 5000000;
+        if (rangeKey === '5-10') return price >= 5000000 && price <= 10000000;
+        if (rangeKey === '10-15') return price > 10000000 && price <= 15000000;
+        if (rangeKey === '15-22') return price > 15000000 && price <= 22000000;
+        if (rangeKey === 'over-22') return price > 22000000;
+        return true;
+      }
+
+      function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const colorMap = {
+          success: 'bg-emerald-900 text-white border-emerald-500/40',
+          warning: 'bg-amber-900 text-white border-amber-500/40',
+          info: 'bg-slate-900 text-white border-indigo-500/40'
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-xl border text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-fade-up ${colorMap[type] || colorMap.info}`;
+        toast.innerHTML = `<span>${message}</span>`;
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(-6px)';
+          toast.style.transition = 'all 0.25s ease';
+          setTimeout(() => toast.remove(), 260);
+        }, 2800);
+      }
+
+      /**
+       * =========================================================================
+       * MODULE 6: RENDER GIAO DIỆN TRANG CHỦ, THƯƠNG HIỆU & SẢN PHẨM
+       * =========================================================================
+       */
+      function updateDashboardStats() {
+        const approvedEl = document.getElementById('statApprovedCount');
+        const brandsEl = document.getElementById('statActiveBrandsCount');
+        const purgedEl = document.getElementById('statPurgedCount');
+        const headerDbBadge = document.getElementById('headerDbCountBadge');
+        const homeBrandsBadge = document.getElementById('homeActiveBrandsBadge');
+
+        if (approvedEl) approvedEl.textContent = String(state.approvedPhones.length);
+        if (brandsEl) brandsEl.textContent = String(state.activeBrands.length);
+        if (purgedEl) purgedEl.textContent = String(state.curationLogs.length);
+        if (headerDbBadge) headerDbBadge.textContent = String(state.approvedPhones.length);
+        if (homeBrandsBadge) homeBrandsBadge.textContent = `${state.activeBrands.length} Hãng Đang Bán`;
+      }
+
+      function renderBrands() {
+        const grid = document.getElementById('brandsGrid');
+        const brandSelect = document.getElementById('brandSelect');
+        if (!grid || !brandSelect) return;
+
+        // Render lưới logo thương hiệu ở trang chủ (chỉ những hãng còn máy đang bán)
+        grid.innerHTML = state.activeBrands.map((brand) => {
+          return `
+            <button
+              onclick="selectBrandFromHome('${brand.id}')"
+              class="group text-left bg-white hover:bg-indigo-50/40 rounded-2xl p-4 border border-slate-200/90 hover:border-indigo-400 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between gap-3"
+            >
+              <div class="flex items-center justify-between gap-2 w-full">
+                <div class="h-9 flex items-center overflow-hidden">
+                  ${brand.logoSvg}
+                </div>
+                <span class="shrink-0 px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 group-hover:bg-indigo-600 text-slate-700 group-hover:text-white transition-colors">
+                  ${brand.activeCount} máy
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                ${brand.tagline}
+              </p>
+            </button>
+          `;
+        }).join('');
+
+        // Cập nhật dropdown chọn thương hiệu
+        const currentSelected = state.brandId;
+        brandSelect.innerHTML = `
+          <option value="all">🏢 Tất cả hãng điện thoại (${state.activeBrands.length} hãng)</option>
+          ${state.activeBrands.map((b) => `<option value="${b.id}">${b.name} (${b.activeCount} máy)</option>`).join('')}
+        `;
+        brandSelect.value = state.activeBrands.some((b) => b.id === currentSelected) ? currentSelected : 'all';
+      }
+
+      function isFilterActive() {
+        return (
+          state.showAllMode ||
+          state.searchQuery.trim() !== '' ||
+          state.priceRange !== 'all' ||
+          state.brandId !== 'all' ||
+          state.criterion !== 'all' ||
+          state.rivalTargetPrice !== null
+        );
+      }
+
+      function filterProducts() {
+        const q = state.searchQuery.trim().toLowerCase();
+
+        let filtered = state.approvedPhones.filter((phone) => {
+          const brand = getBrandById(phone.brandId);
+
+          // 1. Lọc theo từ khóa tìm kiếm điện thoại
+          if (q) {
+            const searchableText = [
+              phone.name,
+              brand.name,
+              brand.shortName,
+              phone.specs.chip,
+              phone.specs.camera,
+              phone.specs.battery,
+              phone.specs.display,
+              phone.targetAudience,
+              ...phone.criteria.map((c) => CRITERION_LABELS[c] || '')
+            ].join(' ').toLowerCase();
+
+            if (!searchableText.includes(q)) return false;
+          }
+
+          // 2. Lọc theo phân khúc giá
+          if (!matchesPriceRange(phone.price, state.priceRange)) return false;
+
+          // 3. Lọc theo thương hiệu
+          if (state.brandId !== 'all' && phone.brandId !== state.brandId) return false;
+
+          // 4. Lọc theo tiêu chí tư vấn
+          if (state.criterion !== 'all' && !phone.criteria.includes(state.criterion)) return false;
+
+          // 5. Lọc theo đối thủ cùng tầm giá (± 3.5 triệu)
+          if (state.rivalTargetPrice !== null) {
+            const diff = Math.abs(phone.price - state.rivalTargetPrice);
+            if (diff > 3500000) return false;
+          }
+
+          return true;
+        });
+
+        // Sắp xếp kết quả
+        filtered.sort((a, b) => {
+          if (state.sortBy === 'price-asc') return a.price - b.price;
+          if (state.sortBy === 'price-desc') return b.price - a.price;
+          if (state.sortBy === 'perf-desc') return b.scores.performance - a.scores.performance;
+          if (state.sortBy === 'cam-desc') return b.scores.camera - a.scores.camera;
+          if (state.sortBy === 'bat-desc') return b.scores.battery - a.scores.battery;
+          return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
+        });
+
+        return filtered;
+      }
+
+      function renderActiveFilterChips() {
+        const chipsContainer = document.getElementById('activeFilterChips');
+        if (!chipsContainer) return;
+
+        const chips = [];
+
+        if (state.searchQuery.trim() !== '') {
+          chips.push(`
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+              Từ khóa: "${state.searchQuery.trim()}"
+              <button onclick="removeFilter('search')" class="hover:text-rose-600 font-bold">×</button>
+            </span>
+          `);
+        }
+
+        if (state.priceRange !== 'all') {
+          chips.push(`
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              Giá: ${PRICE_LABELS[state.priceRange]}
+              <button onclick="removeFilter('price')" class="hover:text-rose-600 font-bold">×</button>
+            </span>
+          `);
+        }
+
+        if (state.brandId !== 'all') {
+          const brand = getBrandById(state.brandId);
+          chips.push(`
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-300">
+              Hãng: ${brand.name}
+              <button onclick="removeFilter('brand')" class="hover:text-rose-600 font-bold">×</button>
+            </span>
+          `);
+        }
+
+        if (state.criterion !== 'all') {
+          chips.push(`
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+              ${CRITERION_LABELS[state.criterion]}
+              <button onclick="removeFilter('criterion')" class="hover:text-rose-600 font-bold">×</button>
+            </span>
+          `);
+        }
+
+        if (state.rivalTargetPrice !== null) {
+          chips.push(`
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-800 border border-purple-200">
+              Đối thủ cùng tầm ${state.rivalReferenceName} (±3.5tr)
+              <button onclick="clearRivalFilter()" class="hover:text-rose-600 font-bold">×</button>
+            </span>
+          `);
+        }
+
+        if (chips.length === 0 && state.showAllMode) {
+          chips.push(`
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+              Tất cả điện thoại đạt chuẩn (${state.approvedPhones.length} máy)
+            </span>
+          `);
+        }
+
+        chipsContainer.innerHTML = chips.join('');
+      }
+
+      function renderProducts() {
+        const homeView = document.getElementById('homeView');
+        const resultsView = document.getElementById('resultsView');
+        const productsGrid = document.getElementById('productsGrid');
+        const emptyState = document.getElementById('emptyState');
+        const resultCountEl = document.getElementById('resultCount');
+
+        saveViewStateToStorage();
+
+        if (!homeView || !resultsView || !productsGrid) return;
+
+        if (!isFilterActive()) {
+          homeView.classList.remove('hidden');
+          resultsView.classList.add('hidden');
+          return;
+        }
+
+        homeView.classList.add('hidden');
+        resultsView.classList.remove('hidden');
+        renderActiveFilterChips();
+
+        const list = filterProducts();
+        if (resultCountEl) resultCountEl.textContent = String(list.length);
+
+        if (list.length === 0) {
+          productsGrid.innerHTML = '';
+          emptyState.classList.remove('hidden');
+          return;
+        }
+
+        emptyState.classList.add('hidden');
+
+        productsGrid.innerHTML = list.map((phone) => {
+          const brand = getBrandById(phone.brandId);
+          const isFav = state.favorites.includes(phone.id);
+          const isComp = state.compareList.includes(phone.id);
+          const isLastClicked = state.lastClickedPhoneId === phone.id;
+          const targetUrl = getTgddProductUrl(phone);
+          const shortPath = targetUrl.replace('https://www.thegioididong.com', '');
+          const cardBorderClass = isComp
+            ? 'border-indigo-500 ring-2 ring-indigo-500/20'
+            : isLastClicked
+              ? 'border-amber-400 ring-2 ring-amber-400/30'
+              : 'border-slate-200/90 hover:border-indigo-300';
+
+          return `
+            <article
+              data-phone-id="${phone.id}"
+              onclick="openPhoneOnTGDD('${phone.id}')"
+              title="Mở trang sản phẩm: ${targetUrl}"
+              class="cursor-pointer group bg-white rounded-2xl border ${cardBorderClass} shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between overflow-hidden"
+            >
+              <div class="p-5 space-y-4">
+                <!-- Header thẻ máy -->
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center gap-1.5 mb-1.5">
+                      <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700">
+                        ${brand.shortName}
+                      </span>
+                      <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                        Ra mắt ${formatDateVN(phone.releaseDate)}
+                      </span>
+                      <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200/80 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
+                        TGDĐ ↗
+                      </span>
+                    </div>
+                    <h3 class="text-base sm:text-lg font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug">
+                      ${phone.name}
+                    </h3>
+                    <div class="text-[11px] text-slate-400 group-hover:text-indigo-500 truncate mt-0.5 transition-colors">
+                      thegioididong.com${shortPath}
+                    </div>
+                  </div>
+
+                  <!-- Nút lưu yêu thích -->
+                  <button
+                    onclick="event.stopPropagation(); toggleFavorite('${phone.id}')"
+                    title="${isFav ? 'Bỏ lưu máy này' : 'Lưu máy vào danh sách tư vấn'}"
+                    class="p-2 rounded-xl border transition-all shrink-0 ${isFav ? 'bg-rose-50 border-rose-200 text-rose-500' : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-rose-500 hover:bg-rose-50/50'}"
+                  >
+                    <svg class="w-5 h-5" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Giá bán & Tags tiêu chí -->
+                <div class="space-y-2">
+                  <div class="text-xl font-extrabold text-indigo-600">
+                    ${formatCurrencyVN(phone.price)}
+                  </div>
+                  <div class="flex flex-wrap gap-1.5">
+                    ${phone.criteria.map((c) => `
+                      <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/70">
+                        ${CRITERION_LABELS[c] || c}
+                      </span>
+                    `).join('')}
+                  </div>
+                </div>
+
+                <!-- Thông số kỹ thuật cốt lõi -->
+                <div class="rounded-xl bg-slate-50/90 border border-slate-200/70 p-3 space-y-1.5 text-xs text-slate-700">
+                  <div class="truncate" title="${phone.specs.chip} • ${phone.specs.ramStorage}">
+                    ⚙️ <strong class="text-slate-900">${phone.specs.chip}</strong> • ${phone.specs.ramStorage}
+                  </div>
+                  <div class="truncate" title="${phone.specs.display}">
+                    🖥️ ${phone.specs.display}
+                  </div>
+                  <div class="truncate" title="${phone.specs.camera}">
+                    📸 ${phone.specs.camera}
+                  </div>
+                  <div class="truncate" title="${phone.specs.battery}">
+                    🔋 <span class="font-semibold text-emerald-700">${phone.specs.battery}</span>
+                  </div>
+                </div>
+
+                <!-- Điểm 4 trụ cột trải nghiệm -->
+                <div class="grid grid-cols-4 gap-1.5 text-center text-[11px]">
+                  <div class="rounded-lg bg-slate-100/80 py-1.5 px-1">
+                    <div class="text-slate-500">Hiệu năng</div>
+                    <div class="font-extrabold text-slate-900">${phone.scores.performance}</div>
+                  </div>
+                  <div class="rounded-lg bg-slate-100/80 py-1.5 px-1">
+                    <div class="text-slate-500">Camera</div>
+                    <div class="font-extrabold text-slate-900">${phone.scores.camera}</div>
+                  </div>
+                  <div class="rounded-lg bg-slate-100/80 py-1.5 px-1">
+                    <div class="text-slate-500">Pin/Sạc</div>
+                    <div class="font-extrabold text-emerald-700">${phone.scores.battery}</div>
+                  </div>
+                  <div class="rounded-lg bg-slate-100/80 py-1.5 px-1">
+                    <div class="text-slate-500">Thiết kế</div>
+                    <div class="font-extrabold text-slate-900">${phone.scores.design}</div>
+                  </div>
+                </div>
+
+                <!-- Gợi ý tư vấn cho Tech Reviewer -->
+                <div class="space-y-1.5 text-xs leading-relaxed">
+                  <p class="text-slate-600">
+                    🎯 <strong class="text-slate-800">Hợp với:</strong> ${phone.targetAudience}
+                  </p>
+                  <div class="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/70 text-amber-950">
+                    💡 <strong>Chốt tư vấn:</strong> ${phone.reviewerNote}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer Nút Hành Động -->
+              <div class="px-5 py-3 bg-slate-50 border-t border-slate-200/80 flex items-center gap-2">
+                <button
+                  onclick="event.stopPropagation(); toggleCompare('${phone.id}')"
+                  class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    isComp
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50'
+                  }"
+                >
+                  <span>${isComp ? '✓ Đã chọn so sánh' : '+ So sánh 2 máy cùng tầm giá'}</span>
+                </button>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      /**
+       * =========================================================================
+       * MODULE 7: TƯƠNG TÁC YÊU THÍCH & SO SÁNH 2 MÁY CÙNG TẦM GIÁ
+       * =========================================================================
+       */
+      function renderFavoritesDrawer() {
+        const container = document.getElementById('favoritesListContainer');
+        const badge = document.getElementById('headerFavBadge');
+        if (badge) badge.textContent = String(state.favorites.length);
+        if (!container) return;
+
+        if (state.favorites.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-12 space-y-2">
+              <p class="text-sm font-bold text-slate-700">Chưa có máy nào trong danh sách lưu</p>
+              <p class="text-xs text-slate-500">Bấm biểu tượng trái tim trên thẻ sản phẩm để lưu lại tư vấn cho khách.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = state.favorites.map((id) => {
+          const phone = state.approvedPhones.find((p) => p.id === id);
+          if (!phone) return '';
+          const brand = getBrandById(phone.brandId);
+          const isComp = state.compareList.includes(phone.id);
+
+          return `
+            <div
+              onclick="openPhoneOnTGDD('${phone.id}')"
+              title="Bấm để tới trang chủ Thế Giới Di Động"
+              class="cursor-pointer group p-3.5 rounded-2xl bg-slate-50 hover:bg-indigo-50/50 border border-slate-200 hover:border-indigo-300 transition-colors flex items-center justify-between gap-3"
+            >
+              <div class="min-w-0">
+                <div class="text-[11px] font-bold text-slate-500">${brand.shortName} • Ra mắt ${formatDateVN(phone.releaseDate)}</div>
+                <div class="font-bold text-sm text-slate-900 group-hover:text-indigo-600 truncate">${phone.name} ↗</div>
+                <div class="text-xs font-extrabold text-indigo-600 mt-0.5">${formatCurrencyVN(phone.price)}</div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button
+                  onclick="event.stopPropagation(); toggleCompare('${phone.id}')"
+                  class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold ${isComp ? 'bg-indigo-600 text-white' : 'bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50'}"
+                >
+                  ${isComp ? 'Đang so sánh' : 'So sánh'}
+                </button>
+                <button
+                  onclick="event.stopPropagation(); toggleFavorite('${phone.id}')"
+                  title="Xóa khỏi danh sách"
+                  class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderCompareBar() {
+        const bar = document.getElementById('floatingCompareBar');
+        const slotsEl = document.getElementById('compareBarSlots');
+        const actionsEl = document.getElementById('compareBarActions');
+        const headerBadge = document.getElementById('headerCompareBadge');
+
+        if (headerBadge) headerBadge.textContent = `${state.compareList.length}/2`;
+        if (!bar || !slotsEl || !actionsEl) return;
+
+        if (state.compareList.length === 0) {
+          bar.classList.add('hidden');
+          return;
+        }
+
+        bar.classList.remove('hidden');
+
+        const phones = state.compareList
+          .map((id) => state.approvedPhones.find((p) => p.id === id))
+          .filter(Boolean);
+
+        const slotHtml = [0, 1].map((idx) => {
+          const p = phones[idx];
+          if (p) {
+            return `
+              <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-indigo-50 border border-indigo-200">
+                <div class="min-w-0">
+                  <div class="text-xs font-extrabold text-slate-900 truncate">${p.name}</div>
+                  <div class="text-[11px] font-bold text-indigo-600">${formatCurrencyVN(p.price)}</div>
+                </div>
+                <button onclick="toggleCompare('${p.id}')" class="text-xs font-bold text-slate-400 hover:text-rose-600 px-1.5">✕</button>
+              </div>
+            `;
+          }
+          return `
+            <div class="flex items-center justify-center px-3 py-2 rounded-xl border border-dashed border-slate-300 text-xs text-slate-400 font-medium">
+              Chọn thêm 1 máy cùng tầm giá để đối chiếu
+            </div>
+          `;
+        }).join('');
+
+        slotsEl.innerHTML = slotHtml;
+
+        if (phones.length === 1) {
+          actionsEl.innerHTML = `
+            <button onclick="suggestSameSegmentRival('${phones[0].id}')" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors">
+              🔍 Tìm đối thủ cùng tầm giá
+            </button>
+            <button onclick="clearCompareList()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold">
+              Xóa
+            </button>
+          `;
+        } else if (phones.length === 2) {
+          actionsEl.innerHTML = `
+            <button onclick="openCompareAnalyzer()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-extrabold shadow-sm transition-colors">
+              ⚔️ Phân tích & So sánh 2 máy ngay
+            </button>
+            <button onclick="clearCompareList()" class="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold">
+              Xóa
+            </button>
+          `;
+        }
+      }
+
+      function openCompareAnalyzer() {
+        if (state.compareList.length < 2) {
+          showToast('Vui lòng chọn đủ 2 mẫu điện thoại để phân tích đối đầu!', 'warning');
+          return;
+        }
+
+        const p1 = state.approvedPhones.find((p) => p.id === state.compareList[0]);
+        const p2 = state.approvedPhones.find((p) => p.id === state.compareList[1]);
+        if (!p1 || !p2) return;
+
+        const b1 = getBrandById(p1.brandId);
+        const b2 = getBrandById(p2.brandId);
+        const priceDiff = Math.abs(p1.price - p2.price);
+
+        const metricRows = [
+          { label: '⚡ Điểm Hiệu năng', v1: p1.scores.performance, v2: p2.scores.performance },
+          { label: '📸 Điểm Camera', v1: p1.scores.camera, v2: p2.scores.camera },
+          { label: '🔋 Điểm Pin & Sạc', v1: p1.scores.battery, v2: p2.scores.battery },
+          { label: '✨ Điểm Thiết kế', v1: p1.scores.design, v2: p2.scores.design }
+        ];
+
+        const modalBody = document.getElementById('compareModalBody');
+        modalBody.innerHTML = `
+          <!-- Tóm tắt chênh lệch giá -->
+          <div class="rounded-2xl bg-indigo-50 border border-indigo-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="text-xs sm:text-sm text-indigo-950 font-semibold">
+              Chênh lệch giá bán chính hãng: <span class="font-extrabold text-indigo-700">${formatCurrencyVN(priceDiff)}</span>
+              ${priceDiff <= 3500000 ? ' (Cùng phân khúc giá — Rất sát sườn!)' : ' (Khác phân khúc giá)'}
+            </div>
+            <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-white text-indigo-700 border border-indigo-200 self-start sm:self-auto">
+              Đều đang kinh doanh tại TGDĐ
+            </span>
+          </div>
+
+          <!-- Bảng so sánh 2 cột -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              onclick="openPhoneOnTGDD('${p1.id}')"
+              title="Bấm để mở trang chủ Thế Giới Di Động"
+              class="cursor-pointer group rounded-2xl border-2 border-indigo-500/40 hover:border-indigo-600 bg-slate-50/70 p-4 space-y-2 transition-colors"
+            >
+              <div class="flex items-center justify-between text-xs font-bold text-indigo-600 uppercase">
+                <span>${b1.shortName} • Ra mắt ${formatDateVN(p1.releaseDate)}</span>
+                <span class="text-[11px] text-amber-700">TGDĐ ↗</span>
+              </div>
+              <h4 class="text-lg font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors">${p1.name}</h4>
+              <div class="text-xl font-extrabold text-indigo-600">${formatCurrencyVN(p1.price)}</div>
+              <p class="text-xs text-slate-600"><strong>Hợp với:</strong> ${p1.targetAudience}</p>
+            </div>
+            <div
+              onclick="openPhoneOnTGDD('${p2.id}')"
+              title="Bấm để mở trang chủ Thế Giới Di Động"
+              class="cursor-pointer group rounded-2xl border-2 border-emerald-500/40 hover:border-emerald-600 bg-slate-50/70 p-4 space-y-2 transition-colors"
+            >
+              <div class="flex items-center justify-between text-xs font-bold text-emerald-600 uppercase">
+                <span>${b2.shortName} • Ra mắt ${formatDateVN(p2.releaseDate)}</span>
+                <span class="text-[11px] text-amber-700">TGDĐ ↗</span>
+              </div>
+              <h4 class="text-lg font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">${p2.name}</h4>
+              <div class="text-xl font-extrabold text-emerald-600">${formatCurrencyVN(p2.price)}</div>
+              <p class="text-xs text-slate-600"><strong>Hợp với:</strong> ${p2.targetAudience}</p>
+            </div>
+          </div>
+
+          <!-- Biểu đồ thanh đối chiếu 4 trụ cột -->
+          <div class="space-y-3">
+            <h5 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Đối chiếu 4 trụ cột trải nghiệm</h5>
+            ${metricRows.map((m) => `
+              <div class="rounded-xl bg-white border border-slate-200 p-3 space-y-1.5">
+                <div class="flex items-center justify-between text-xs font-bold">
+                  <span class="${m.v1 >= m.v2 ? 'text-indigo-700' : 'text-slate-600'}">${p1.name}: ${m.v1}/100 ${m.v1 > m.v2 ? '🏆' : ''}</span>
+                  <span class="text-slate-800">${m.label}</span>
+                  <span class="${m.v2 >= m.v1 ? 'text-emerald-700' : 'text-slate-600'}">${m.v2 > m.v1 ? '🏆' : ''} ${p2.name}: ${m.v2}/100</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div class="h-2 rounded-full bg-slate-100 overflow-hidden flex justify-end">
+                    <div class="h-full bg-indigo-600 rounded-full" style="width: ${m.v1}%"></div>
+                  </div>
+                  <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div class="h-full bg-emerald-600 rounded-full" style="width: ${m.v2}%"></div>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Bảng thông số kỹ thuật chi tiết -->
+          <div class="border border-slate-200 rounded-2xl overflow-hidden text-xs sm:text-sm">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-slate-100 text-slate-700 font-bold">
+                <tr>
+                  <th class="p-3 w-1/4">Tiêu chí</th>
+                  <th class="p-3 w-3/8 text-indigo-800">${p1.name}</th>
+                  <th class="p-3 w-3/8 text-emerald-800">${p2.name}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                <tr>
+                  <td class="p-3 font-semibold text-slate-500">Vi xử lý</td>
+                  <td class="p-3 font-medium">${p1.specs.chip}</td>
+                  <td class="p-3 font-medium">${p2.specs.chip}</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-slate-500">RAM / Bộ nhớ</td>
+                  <td class="p-3">${p1.specs.ramStorage}</td>
+                  <td class="p-3">${p2.specs.ramStorage}</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-slate-500">Màn hình</td>
+                  <td class="p-3">${p1.specs.display}</td>
+                  <td class="p-3">${p2.specs.display}</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-slate-500">Camera</td>
+                  <td class="p-3">${p1.specs.camera}</td>
+                  <td class="p-3">${p2.specs.camera}</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-slate-500">Pin & Sạc</td>
+                  <td class="p-3 font-semibold text-emerald-700">${p1.specs.battery}</td>
+                  <td class="p-3 font-semibold text-emerald-700">${p2.specs.battery}</td>
+                </tr>
+                <tr class="bg-amber-50/60">
+                  <td class="p-3 font-bold text-amber-900">Chốt tư vấn</td>
+                  <td class="p-3 text-xs text-slate-700">${p1.reviewerNote}</td>
+                  <td class="p-3 text-xs text-slate-700">${p2.reviewerNote}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        document.getElementById('compareModal').classList.remove('hidden');
+      }
+
+      /**
+       * =========================================================================
+       * MODULE 8: QUẢN LÝ & KIỂM DUYỆT DATABASE 3 TIÊU CHÍ (DB MANAGER MODAL)
+       * =========================================================================
+       */
+      function renderDbManagerModal() {
+        const reportBox = document.getElementById('dbAuditReportBox');
+        const tableContainer = document.getElementById('dbRawTableContainer');
+        const newBrandSelect = document.getElementById('newPhoneBrand');
+
+        if (newBrandSelect) {
+          newBrandSelect.innerHTML = BRANDS_MASTER.map(
+            (b) => `<option value="${b.id}">${b.name}</option>`
+          ).join('');
+        }
+
+        if (reportBox) {
+          const hiddenBrandsText = state.hiddenBrands.length > 0
+            ? state.hiddenBrands.map((b) => `<span class="font-bold text-rose-700">${b.name}</span>`).join(', ')
+            : 'Không có';
+
+          reportBox.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-2 font-bold text-slate-900">
+              <span>📊 Kết quả kiểm duyệt tự động (Tính tới 16/11/2026):</span>
+              <span class="text-emerald-700">${state.approvedPhones.length} máy đạt chuẩn • ${state.activeBrands.length} hãng hiển thị</span>
+            </div>
+            <p class="text-slate-600">
+              • <strong>Hãng tự động ẩn khỏi trang chủ do không còn máy đang kinh doanh:</strong> ${hiddenBrandsText}
+            </p>
+            ${state.curationLogs.length > 0 ? `
+              <div class="pt-1 space-y-1">
+                <div class="font-semibold text-rose-700">Các mẫu máy bị loại tự động (${state.curationLogs.length} máy):</div>
+                <ul class="list-disc pl-5 text-xs text-slate-600 space-y-0.5">
+                  ${state.curationLogs.map((l) => `<li><strong>${l.name}</strong>: ${l.reason}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+          `;
+        }
+
+        if (tableContainer) {
+          const approvedSet = new Set(state.approvedPhones.map((p) => p.id));
+
+          tableContainer.innerHTML = state.rawPhones.map((phone) => {
+            const brand = getBrandById(phone.brandId);
+            const isApproved = approvedSet.has(phone.id);
+            const isSelling = phone.status === 'Đang kinh doanh';
+
+            return `
+              <div
+                onclick="openPhoneOnTGDD('${phone.id}')"
+                title="Bấm để mở trang chủ Thế Giới Di Động"
+                class="cursor-pointer group px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${isApproved ? 'bg-white hover:bg-indigo-50/40' : 'bg-rose-50/50 hover:bg-rose-50'} transition-colors"
+              >
+                <div class="space-y-0.5">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">${phone.name} ↗</span>
+                    <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700">${brand.shortName}</span>
+                    <span class="text-xs text-slate-500">Ra mắt: ${formatDateVN(phone.releaseDate)}</span>
+                    <span class="text-xs font-bold text-indigo-600">${formatCurrencyVN(phone.price)}</span>
+                  </div>
+                  <div class="text-[11px] ${isApproved ? 'text-emerald-700 font-semibold' : 'text-rose-600 font-semibold'}">
+                    ${isApproved ? '✓ Đạt 3 tiêu chí & Đang hiển thị trên web' : '✕ Đã bị loại khỏi web (Ngừng kinh doanh / Quá 1 năm / Vượt top 10 hãng)'}
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <button
+                    onclick="event.stopPropagation(); toggleRawPhoneStatus('${phone.id}')"
+                    class="px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors ${
+                      isSelling
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200'
+                        : 'bg-rose-100 text-rose-700 border-rose-300 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200'
+                    }"
+                  >
+                    ${isSelling ? '● Đang kinh doanh (Bấm để ngừng)' : '○ Ngừng kinh doanh (Bấm mở bán lại)'}
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      /**
+       * =========================================================================
+       * MODULE 9: CÁC HÀM XỬ LÝ SỰ KIỆN TƯƠNG TÁC NGƯỜI DÙNG
+       * =========================================================================
+       */
+      function openPhoneOnTGDD(phoneId) {
+        const phone =
+          state.rawPhones.find((p) => p.id === phoneId) ||
+          state.approvedPhones.find((p) => p.id === phoneId);
+
+        const targetUrl = getTgddProductUrl(phone);
+
+        // Lưu lại vị trí cuộn & mẫu máy vừa bấm trước khi chuyển sang TGDĐ
+        state.lastClickedPhoneId = phoneId || '';
+        state.savedScrollY = window.scrollY || window.pageYOffset || 0;
+        saveViewStateToStorage();
+
+        if (phone) {
+          showToast(`🔗 Đang mở ${phone.name} tại ${targetUrl}`, 'info');
+        }
+
+        const openedWindow = window.open(targetUrl, '_blank', 'noopener,noreferrer');
+        if (!openedWindow) {
+          const tempLink = document.createElement('a');
+          tempLink.href = targetUrl;
+          tempLink.target = '_blank';
+          tempLink.rel = 'noopener noreferrer';
+          document.body.appendChild(tempLink);
+          tempLink.click();
+          tempLink.remove();
+        }
+      }
+
+      function syncCriterionPillsUI() {
+        document.querySelectorAll('.criterion-pill').forEach((btn) => {
+          const crit = btn.getAttribute('data-criterion');
+          if (crit === state.criterion) {
+            btn.className = 'criterion-pill active shrink-0 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold border transition-all bg-indigo-600 text-white border-indigo-600 shadow-xs';
+          } else {
+            btn.className = 'criterion-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold border transition-all bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/60';
+          }
+        });
+      }
+
+      function resetToHome() {
+        state.searchQuery = '';
+        state.priceRange = 'all';
+        state.brandId = 'all';
+        state.criterion = 'all';
+        state.showAllMode = false;
+        state.rivalTargetPrice = null;
+        state.rivalReferenceName = '';
+        state.savedScrollY = 0;
+        state.lastClickedPhoneId = '';
+
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        const priceSelect = document.getElementById('priceSelect');
+        const brandSelect = document.getElementById('brandSelect');
+
+        if (searchInput) searchInput.value = '';
+        if (clearBtn) clearBtn.classList.add('hidden');
+        if (priceSelect) priceSelect.value = 'all';
+        if (brandSelect) brandSelect.value = 'all';
+
+        syncCriterionPillsUI();
+        renderProducts();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function clearSearchInput() {
+        state.searchQuery = '';
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        if (searchInput) {
+          searchInput.value = '';
+          searchInput.focus();
+        }
+        if (clearBtn) clearBtn.classList.add('hidden');
+        renderProducts();
+      }
+
+      function showAllProducts() {
+        state.showAllMode = true;
+        renderProducts();
+      }
+
+      function selectBrandFromHome(brandId) {
+        state.brandId = brandId;
+        state.showAllMode = false;
+        const brandSelect = document.getElementById('brandSelect');
+        if (brandSelect) brandSelect.value = brandId;
+        renderProducts();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function applyQuickScenario(priceRange, criterion) {
+        state.priceRange = priceRange;
+        state.criterion = criterion;
+        state.brandId = 'all';
+        state.searchQuery = '';
+        state.rivalTargetPrice = null;
+        state.showAllMode = false;
+
+        const priceSelect = document.getElementById('priceSelect');
+        const brandSelect = document.getElementById('brandSelect');
+        const searchInput = document.getElementById('searchInput');
+        if (priceSelect) priceSelect.value = priceRange;
+        if (brandSelect) brandSelect.value = 'all';
+        if (searchInput) searchInput.value = '';
+
+        syncCriterionPillsUI();
+        renderProducts();
+      }
+
+      function removeFilter(type) {
+        if (type === 'search') {
+          state.searchQuery = '';
+          const searchInput = document.getElementById('searchInput');
+          const clearBtn = document.getElementById('clearSearchBtn');
+          if (searchInput) searchInput.value = '';
+          if (clearBtn) clearBtn.classList.add('hidden');
+        } else if (type === 'price') {
+          state.priceRange = 'all';
+          const priceSelect = document.getElementById('priceSelect');
+          if (priceSelect) priceSelect.value = 'all';
+        } else if (type === 'brand') {
+          state.brandId = 'all';
+          const brandSelect = document.getElementById('brandSelect');
+          if (brandSelect) brandSelect.value = 'all';
+        } else if (type === 'criterion') {
+          state.criterion = 'all';
+          syncCriterionPillsUI();
+        }
+        renderProducts();
+      }
+
+      function clearRivalFilter() {
+        state.rivalTargetPrice = null;
+        state.rivalReferenceName = '';
+        renderProducts();
+      }
+
+      function toggleFavorite(phoneId) {
+        const phone = state.approvedPhones.find((p) => p.id === phoneId);
+        if (!phone) return;
+
+        const idx = state.favorites.indexOf(phoneId);
+        if (idx === -1) {
+          state.favorites.push(phoneId);
+          showToast(`❤️ Đã lưu ${phone.name} vào danh sách tư vấn`, 'success');
+        } else {
+          state.favorites.splice(idx, 1);
+          showToast(`Đã bỏ lưu ${phone.name}`, 'info');
+        }
+
+        saveToLocalStorage();
+        renderFavoritesDrawer();
+        renderProducts();
+      }
+
+      function clearAllFavorites() {
+        state.favorites = [];
+        saveToLocalStorage();
+        renderFavoritesDrawer();
+        renderProducts();
+        showToast('Đã xóa toàn bộ danh sách máy đã lưu', 'info');
+      }
+
+      function toggleFavoritesDrawer(open) {
+        const drawer = document.getElementById('favoritesDrawer');
+        const backdrop = document.getElementById('favoritesDrawerBackdrop');
+        if (!drawer || !backdrop) return;
+
+        if (open) {
+          renderFavoritesDrawer();
+          backdrop.classList.remove('hidden');
+          drawer.classList.remove('translate-x-full');
+        } else {
+          backdrop.classList.add('hidden');
+          drawer.classList.add('translate-x-full');
+        }
+      }
+
+      function toggleCompare(phoneId) {
+        const phone = state.approvedPhones.find((p) => p.id === phoneId);
+        if (!phone) return;
+
+        const idx = state.compareList.indexOf(phoneId);
+        if (idx !== -1) {
+          state.compareList.splice(idx, 1);
+          showToast(`Đã bỏ ${phone.name} khỏi thanh so sánh`, 'info');
+        } else {
+          if (state.compareList.length >= 2) {
+            state.compareList.shift();
+          }
+          state.compareList.push(phoneId);
+          showToast(`⚖️ Đã thêm ${phone.name} vào bàn cân (${state.compareList.length}/2)`, 'success');
+        }
+
+        saveToLocalStorage();
+        renderCompareBar();
+        renderFavoritesDrawer();
+        renderProducts();
+      }
+
+      function suggestSameSegmentRival(phoneId) {
+        const phone = state.approvedPhones.find((p) => p.id === phoneId);
+        if (!phone) return;
+
+        state.priceRange = 'all';
+        state.brandId = 'all';
+        state.criterion = 'all';
+        state.searchQuery = '';
+        state.rivalTargetPrice = phone.price;
+        state.rivalReferenceName = phone.name;
+
+        const priceSelect = document.getElementById('priceSelect');
+        const brandSelect = document.getElementById('brandSelect');
+        const searchInput = document.getElementById('searchInput');
+        if (priceSelect) priceSelect.value = 'all';
+        if (brandSelect) brandSelect.value = 'all';
+        if (searchInput) searchInput.value = '';
+
+        syncCriterionPillsUI();
+        renderProducts();
+        showToast(`Đang lọc các đối thủ cùng tầm giá với ${phone.name}`, 'info');
+      }
+
+      function clearCompareList() {
+        state.compareList = [];
+        saveToLocalStorage();
+        renderCompareBar();
+        renderFavoritesDrawer();
+        renderProducts();
+      }
+
+      function handleHeaderCompareClick() {
+        if (state.compareList.length === 2) {
+          openCompareAnalyzer();
+        } else if (state.compareList.length === 1) {
+          suggestSameSegmentRival(state.compareList[0]);
+        } else {
+          showAllProducts();
+          showToast('Hãy chọn 2 mẫu máy bất kỳ để đối chiếu thông số!', 'info');
+        }
+      }
+
+      function closeCompareModal() {
+        const modal = document.getElementById('compareModal');
+        if (modal) modal.classList.add('hidden');
+      }
+
+      function openDbManagerModal() {
+        renderDbManagerModal();
+        const modal = document.getElementById('dbManagerModal');
+        if (modal) modal.classList.remove('hidden');
+      }
+
+      function closeDbManagerModal() {
+        const modal = document.getElementById('dbManagerModal');
+        if (modal) modal.classList.add('hidden');
+      }
+
+      function toggleRawPhoneStatus(phoneId) {
+        const target = state.rawPhones.find((p) => p.id === phoneId);
+        if (!target) return;
+
+        target.status = target.status === 'Đang kinh doanh' ? 'Ngừng kinh doanh' : 'Đang kinh doanh';
+        syncCuratedState();
+        renderBrands();
+        renderProducts();
+        renderFavoritesDrawer();
+        renderCompareBar();
+        renderDbManagerModal();
+
+        if (target.status === 'Ngừng kinh doanh') {
+          showToast(`🗑️ Đã chuyển "${target.name}" sang Ngừng kinh doanh và xóa khỏi web!`, 'warning');
+        } else {
+          showToast(`✅ Đã mở bán lại "${target.name}"!`, 'success');
+        }
+      }
+
+      function handleAddPhoneSubmit(event) {
+        event.preventDefault();
+
+        const name = document.getElementById('newPhoneName').value.trim();
+        const brandId = document.getElementById('newPhoneBrand').value;
+        const price = Number(document.getElementById('newPhonePrice').value);
+        const releaseDate = document.getElementById('newPhoneDate').value;
+        const status = document.getElementById('newPhoneStatus').value;
+        const chip = document.getElementById('newPhoneChip').value.trim() || 'Vi xử lý thế hệ mới 2026';
+        const camera = document.getElementById('newPhoneCamera').value.trim() || 'Camera 50MP AI OIS';
+        const battery = document.getElementById('newPhoneBattery').value.trim() || '5500mAh • Sạc nhanh 65W';
+        const customUrlInput = document.getElementById('newPhoneUrl').value.trim();
+
+        if (!name || !price || !releaseDate) return;
+
+        const newPhone = {
+          id: 'custom-' + Date.now(),
+          name,
+          brandId,
+          price,
+          releaseDate,
+          status,
+          tgddUrl: customUrlInput || '',
+          criteria: ['performance', 'design'],
+          scores: { performance: 90, camera: 88, battery: 90, design: 90 },
+          specs: {
+            chip,
+            ramStorage: '12GB / 256GB',
+            display: '6.7" AMOLED 120Hz',
+            camera,
+            battery
+          },
+          targetAudience: 'Khách hàng tìm kiếm smartphone thế hệ mới chính hãng tại Thế Giới Di Động.',
+          reviewerNote: 'Mẫu máy mới bổ sung vào hệ thống kiểm duyệt.'
+        };
+
+        newPhone.tgddUrl = getTgddProductUrl(newPhone);
+
+        state.rawPhones.unshift(newPhone);
+        syncCuratedState();
+        renderBrands();
+        renderProducts();
+        renderDbManagerModal();
+
+        event.target.reset();
+        document.getElementById('newPhoneDate').value = '2026-11-10';
+        showToast(`Đã kiểm duyệt "${name}" → ${newPhone.tgddUrl}`, 'success');
+      }
+
+      function resetDatabaseToDefault() {
+        state.rawPhones = structuredClone(RAW_PHONES_DEFAULT);
+        syncCuratedState();
+        renderBrands();
+        renderProducts();
+        renderFavoritesDrawer();
+        renderCompareBar();
+        renderDbManagerModal();
+        showToast('Đã khôi phục dữ liệu chuẩn Thế Giới Di Động (16/11/2026)', 'info');
+      }
+
+      /**
+       * =========================================================================
+       * MODULE 10: KHỞI TẠO ỨNG DỤNG & GẮN SỰ KIỆN DOM
+       * =========================================================================
+       */
+      function initApp() {
+        if (window.__smartphoneMatcherReady) return;
+        window.__smartphoneMatcherReady = true;
+
+        loadFromLocalStorage();
+        syncCuratedState();
+        renderBrands();
+
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const priceSelect = document.getElementById('priceSelect');
+        const brandSelect = document.getElementById('brandSelect');
+        const sortSelect = document.getElementById('sortSelect');
+
+        if (searchInput) searchInput.value = state.searchQuery;
+        if (clearSearchBtn) clearSearchBtn.classList.toggle('hidden', state.searchQuery.trim() === '');
+        if (priceSelect) priceSelect.value = state.priceRange;
+        if (brandSelect) brandSelect.value = state.brandId;
+        if (sortSelect) sortSelect.value = state.sortBy;
+        syncCriterionPillsUI();
+
+        renderFavoritesDrawer();
+        renderCompareBar();
+        renderProducts();
+
+        if (isFilterActive() && state.savedScrollY > 0) {
+          requestAnimationFrame(() => {
+            window.scrollTo({ top: state.savedScrollY, behavior: 'instant' });
+          });
+        }
+
+        window.addEventListener('pagehide', () => {
+          state.savedScrollY = window.scrollY || window.pageYOffset || 0;
+          saveViewStateToStorage();
+        });
+
+        window.addEventListener('pageshow', (event) => {
+          if (event.persisted && isFilterActive()) {
+            renderProducts();
+          }
+        });
+
+        if (searchInput) {
+          searchInput.addEventListener('input', (e) => {
+            state.searchQuery = e.target.value;
+            if (clearSearchBtn) {
+              clearSearchBtn.classList.toggle('hidden', state.searchQuery.trim() === '');
+            }
+            renderProducts();
+          });
+        }
+
+        if (priceSelect) {
+          priceSelect.addEventListener('change', (e) => {
+            state.priceRange = e.target.value;
+            renderProducts();
+          });
+        }
+
+        if (brandSelect) {
+          brandSelect.addEventListener('change', (e) => {
+            state.brandId = e.target.value;
+            renderProducts();
+          });
+        }
+
+        if (sortSelect) {
+          sortSelect.addEventListener('change', (e) => {
+            state.sortBy = e.target.value;
+            renderProducts();
+          });
+        }
+
+        document.querySelectorAll('.criterion-pill').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.criterion = btn.getAttribute('data-criterion') || 'all';
+            syncCriterionPillsUI();
+            renderProducts();
+          });
+        });
+
+        const compareModal = document.getElementById('compareModal');
+        if (compareModal) {
+          compareModal.addEventListener('click', (e) => {
+            if (e.target.id === 'compareModal') {
+              closeCompareModal();
+            }
+          });
+        }
+
+        const dbManagerModal = document.getElementById('dbManagerModal');
+        if (dbManagerModal) {
+          dbManagerModal.addEventListener('click', (e) => {
+            if (e.target.id === 'dbManagerModal') {
+              closeDbManagerModal();
+            }
+          });
+        }
+      }
+
+      // Đăng ký các hàm điều khiển lên window để tương thích với các sự kiện onclick/onsubmit
+      Object.assign(window, {
+        openPhoneOnTGDD,
+        resetToHome,
+        openDbManagerModal,
+        closeDbManagerModal,
+        toggleFavoritesDrawer,
+        handleHeaderCompareClick,
+        clearSearchInput,
+        applyQuickScenario,
+        showAllProducts,
+        selectBrandFromHome,
+        clearRivalFilter,
+        removeFilter,
+        toggleFavorite,
+        toggleCompare,
+        clearAllFavorites,
+        suggestSameSegmentRival,
+        clearCompareList,
+        openCompareAnalyzer,
+        closeCompareModal,
+        toggleRawPhoneStatus,
+        handleAddPhoneSubmit,
+        resetDatabaseToDefault
+      });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+      } else {
+        initApp();
+      }
+    })();
+  </script>
+</body>
+</html>
